@@ -1,17 +1,18 @@
 #include <Logging.h>
 
-// PIN Assignements
-int PIN_STEER_SPEED  = 5;     // Steering Speed Control (PWM)
-int PIN_STEER_DIR1   = 9;     // Steering Direction 1
-int PIN_STEER_DIR2   = 8;     // Steering Direction 2
-int PIN_STEER_STBY   = 10;    // Steering Standby
-int PIN_STEER_POT    = 0;     // Steering Position Potentiometer
+#define LOGLEVEL LOG_LEVEL_DEBUG
 
-// Drive Motor (PINs)
-int PWM_DRIVE = 6;    //Speed control
-int AIN1_DRIVE = 11;  //Direction
-int AIN2_DRIVE = 12;  //Direction
-int PIN_DRIVE_FB     = 5; // Current feedback
+int static MOTOR_STEER 		= 1;
+int static MOTOR_DRIVE 		= 2;
+int static MOTOR_CW			= 0;
+int static MOTOR_CCW		= 1;
+int static TURN_LEFT 		= MOTOR_CW;
+int static TURN_RIGHT 		= MOTOR_CCW;
+int static TURN_STRAIGHT 	= 3;
+int static TURN_STOP		= 4;
+int static DRIVE_FORWARD 	= MOTOR_CW;
+int static DRIVE_REVERSE 	= MOTOR_CCW;
+int static DRIVE_STOP 		= 3;
 
 /*
   Potentiometer Edge Values (Right - Left)
@@ -23,172 +24,143 @@ int PIN_DRIVE_FB     = 5; // Current feedback
 int static POT_LEFT_MAX = 610;
 int static POT_RIGHT_MAX = 380;
 
-int static MOTOR_STEER = 1;
-int static MOTOR_DRIVE = 2;
+// PIN Assignements
+int PIN_STEER_SPEED  = 5;     // Steering Motor Speed Control (PWM)
+int PIN_STEER_DIR1   = 9;     // Steering Motor Direction/Input 1
+int PIN_STEER_DIR2   = 8;     // Steering Motor Direction/Input 2
+int PIN_STEER_STBY   = 10;    // Steering Motor Standby/Sleep
+int PIN_STEER_POT    = 0;     // Steering Motor Position Potentiometer
+int PIN_DRIVE_SPEED  = 6;     // Drive Motor Speed Control (PWM)
+int PIN_DRIVE_DIR1   = 11;    // Drive Motor Direction/Input 1
+int PIN_DRIVE_DIR2   = 12;    // Drive Motor Direction/Input 2
+int PIN_DRIVE_STBY   = -1;    // Drive Motor Standby/Sleep
+int PIN_DRIVE_FB     = 5;     // Drive Motor Current Feedback
 
-int static TURN_LEFT = 0;
-int static TURN_RIGHT = 1;
-int static TURN_STRAIGHT = 3;
-int static DRIVE_FORWARD = 0;
-int static DRIVE_REVERSE = 1;
-int static DRIVE_STOP = 2;
-
-
-// Steering Motor (Control)
-int STEER_SPEED = 255; // 0 - 255
-
-//Steering Position
-int steerDir = 0;
-int potVal = 0;       // variable to store the value coming from the sensor
-
-// Drive
-int driveDir = 0;
-
-// Drive Motor
+// Static (for now) Motor Speeds (0-255)
+int STEER_SPEED = 255;
 int DRIVE_SPEED = 255;
+
+// Sensor values
+int input_steer_pot_value = 0;
 
 // State variables
 int state_turn_direction;
 int state_drive_direction;
 
-#define LOGLEVEL LOG_LEVEL_DEBUG
-
 void setup() {
 
-  Log.Init(LOGLEVEL, 38400L);
-  //Log.Info(CR"******************************************"CR);
-  pinMode(PIN_STEER_STBY, OUTPUT);
+	// Initialize Loggins
+  	Log.Init(LOGLEVEL, 38400L);
 
-  // Enable STEERING Controls
-  pinMode(PIN_STEER_SPEED, OUTPUT);
-  pinMode(PIN_STEER_DIR1, OUTPUT);
-  pinMode(PIN_STEER_DIR2, OUTPUT);
+	// Enable STEERING Controls
+	pinMode(PIN_STEER_STBY, OUTPUT);
+	pinMode(PIN_STEER_SPEED, OUTPUT);
+	pinMode(PIN_STEER_DIR1, OUTPUT);
+	pinMode(PIN_STEER_DIR2, OUTPUT);
 
-  // Enable DRIVE Controls
-  pinMode(PWM_DRIVE, OUTPUT);
-  pinMode(AIN1_DRIVE, OUTPUT);
-  pinMode(AIN2_DRIVE, OUTPUT);
+	// Enable DRIVE Controls
+	pinMode(PIN_DRIVE_STBY, OUTPUT);
+	pinMode(PIN_DRIVE_SPEED, OUTPUT);
+	pinMode(PIN_DRIVE_DIR1, OUTPUT);
+	pinMode(PIN_DRIVE_DIR2, OUTPUT);
 
-  // Debug
-  Serial.begin(38400);      // open the serial port at 9600 bps:
+	// Open Serial port for loggins (38400 baud)
+	Serial.begin(38400);
 }
 
 void loop() {
 
-  Log.Info("%d", millis() % 10000);
-  if((millis() % 10000) < 5000) {
-     state_turn_direction = TURN_LEFT;
-  } else {
-    state_turn_direction = TURN_RIGHT;
-  }
-  
-  if((millis() % 5000) < 2000) {
-    state_drive_direction = DRIVE_FORWARD;
-  } else {
-    state_drive_direction = DRIVE_STOP;
-  }
-  
-  
-  //state_turn_direction = TURN_LEFT; 
-  drive();
-  turn(); 
-  
-  int fbVal = analogRead(PIN_DRIVE_FB); // read the value of the feedback current
-  if(fbVal != 0) {
-  //  Serial.print(fbVal);
-   
-  }
+  	// Execute current drive/turn commands
+  	program();
+	drive();
+	turn(); 
 
-/*  if (potVal >= POT_LEFT_MAX || potVal <= POT_RIGHT_MAX) {
+}
 
-    //Serial.print("Stopped!");
+/* 
+	Based on time since start (millis()), set state configuration 
+*/
+void program() {
 
-    if (potVal >= POT_LEFT_MAX) {
-      steerDir = 1;
-      //Serial.print("1");
-      //driveDir = 1;
-    } else {
-      steerDir = 0;
-      driveDir = 0;
-    }
-  }*/
-    /*
-  drive(MOVE_FORWARD);
-  delay(2000);
-  state_turn = TURN_LEFT;
-  delay(1000);
-  turn(TURN_STRAIGHT);
-  delay(2000);
-  turn(TURN_RIGHT);
-  delay(2000);
-  turn(TURN_STRAIGHT);
- delay(500);*/
-  
-  //drive(MOVE_STOP);
-  
-  
-  //attachInterrupt(0, blink, CHANGE);
-  
-  //move(MOTOR_STEER, STEER_SPEED, steerDir);
-  //move(MOTOR_DRIVE, DRIVE_SPEED, driveDir);
-  //Serial.print("Motor: ", DRIVE_SPEED);
-  delay(200);  // stop the program for some time
+	// For 5 seconds turn left, for 5 seconds turn right
+	if((millis() % 10000) < 5000) {
+		state_turn_direction = TURN_LEFT;
+	} else {
+		state_turn_direction = TURN_RIGHT;
+	}
+
+	// For the first two seconds of every 5, drive forward
+	if((millis() % 5000) < 2000) {
+		state_drive_direction = DRIVE_FORWARD;
+	} else {
+		state_drive_direction = DRIVE_STOP;
+	}
+
 }
 
 void drive() {
-  if(state_drive_direction == DRIVE_STOP) {
-    move(MOTOR_DRIVE, 0, state_drive_direction);
-  } else {
-    move(MOTOR_DRIVE, DRIVE_SPEED, state_drive_direction);
-  }
-}
 
+	if(state_drive_direction == DRIVE_STOP) {
+		stop(MOTOR_DRIVE);
+  	} else {
+    	move(MOTOR_DRIVE, DRIVE_SPEED, state_drive_direction);
+  	}
+
+}
 
 void turn() {
    
-  potVal = analogRead(PIN_STEER_POT);    // read the value from the sensor
+  input_steer_pot_value = analogRead(PIN_STEER_POT);    // read the value from the sensor
   
-  Log.Info("Wanting to move %d, %d"CR, state_turn_direction, potVal);
+  Log.Info("Wanting to move %d, %d"CR, state_turn_direction, input_steer_pot_value);
   if (potVal >= POT_LEFT_MAX && state_turn_direction == TURN_LEFT) {
-    stop();
+    stop(MOTOR_STEER);
     Log.Info("Maxed Left"CR);
   } else if(potVal <= POT_RIGHT_MAX && state_turn_direction == TURN_RIGHT) {
-    stop();
+    stop(MOTOR_STEER);
     Log.Info("Maxed Right"CR);
   } else {
      Log.Info("Turning %d"CR, state_turn_direction);
      move(MOTOR_STEER, STEER_SPEED, state_turn_direction);
   }
+
 }
 
+/*
+	Motor (Motor ID)
+	Speed (0 - 255)
+	Direction: (0 = Forward/Left; 1 = Reverse/Right)
+*/
 void move(int motor, int speed, int direction) {
-
-  //Move specific motor at speed and direction
-  //speed: 0 is off, and 255 is full speed
-  //direction: 0 clockwise, 1 counter-clockwise
-
-  digitalWrite(PIN_STEER_STBY, HIGH); //disable standby
 
   boolean inPin1 = LOW;
   boolean inPin2 = HIGH;
 
-  if (direction == 1) {
+  if (direction == MOTOR_CCW) {
     inPin1 = HIGH;
     inPin2 = LOW;
   }
 
   if (motor == MOTOR_STEER) {
+  	digitalWrite(PIN_STEER_STBY, HIGH); // Disable Standby/Sleep
     digitalWrite(PIN_STEER_DIR1, inPin1);
     digitalWrite(PIN_STEER_DIR2, inPin2);
     analogWrite(PIN_STEER_SPEED, speed);
   } else if (motor == MOTOR_DRIVE) {
-    digitalWrite(AIN1_DRIVE, inPin1);
-    digitalWrite(AIN2_DRIVE, inPin2);
-    analogWrite(PWM_DRIVE, speed);
+  	digitalWrite(PIN_DRIVE_STBY, HIGH); // Disable Standby/Sleep
+    digitalWrite(PIN_DRIVE_DIR1, inPin1);
+    digitalWrite(PIN_DRIVE_DIR2, inPin2);
+    analogWrite(PIN_DRIVE_SPEED, speed);
   }
 }
 
-void stop() {
-  //enable standby
-  digitalWrite(PIN_STEER_STBY, LOW);
+/*
+	Stop a motor by enabling the Standby/Sleep funciton
+*/
+void stop(int motor) {
+	if (motor == MOTOR_STEER) {
+		digitalWrite(PIN_STEER_STBY, LOW); // Enable Standby/Sleep
+	} else if (motor == MOTOR_DRIVE) {
+		digitalWrite(PIN_DRIVE_STBY, LOW); // Enable Standby/Sleep
+	}
 }
