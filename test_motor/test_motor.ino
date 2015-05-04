@@ -110,19 +110,19 @@ void drive() {
 
 void turn() {
    
-  input_steer_pot_value = analogRead(PIN_STEER_POT);    // read the value from the sensor
-  
-  Log.Info("Wanting to move %d, %d"CR, state_turn_direction, input_steer_pot_value);
-  if (potVal >= POT_LEFT_MAX && state_turn_direction == TURN_LEFT) {
-    stop(MOTOR_STEER);
-    Log.Info("Maxed Left"CR);
-  } else if(potVal <= POT_RIGHT_MAX && state_turn_direction == TURN_RIGHT) {
-    stop(MOTOR_STEER);
-    Log.Info("Maxed Right"CR);
-  } else {
-     Log.Info("Turning %d"CR, state_turn_direction);
-     move(MOTOR_STEER, STEER_SPEED, state_turn_direction);
-  }
+	input_steer_pot_value = analogRead(PIN_STEER_POT);    // read the value from the sensor
+
+	Log.Info("Wanting to move %d, %d"CR, state_turn_direction, input_steer_pot_value);
+	if (potVal >= POT_LEFT_MAX && state_turn_direction == TURN_LEFT) {
+		stop(MOTOR_STEER);
+		Log.Info("Maxed Left"CR);
+	} else if(potVal <= POT_RIGHT_MAX && state_turn_direction == TURN_RIGHT) {
+		stop(MOTOR_STEER);
+		Log.Info("Maxed Right"CR);
+		} else {
+		 Log.Info("Turning %d"CR, state_turn_direction);
+		 move(MOTOR_STEER, STEER_SPEED, state_turn_direction);
+	}
 
 }
 
@@ -133,25 +133,25 @@ void turn() {
 */
 void move(int motor, int speed, int direction) {
 
-  boolean inPin1 = LOW;
-  boolean inPin2 = HIGH;
+	boolean inPin1 = LOW;
+	boolean inPin2 = HIGH;
 
-  if (direction == MOTOR_CCW) {
-    inPin1 = HIGH;
-    inPin2 = LOW;
-  }
+	if (direction == MOTOR_CCW) {
+		inPin1 = HIGH;
+		inPin2 = LOW;
+	}
 
-  if (motor == MOTOR_STEER) {
-  	digitalWrite(PIN_STEER_STBY, HIGH); // Disable Standby/Sleep
-    digitalWrite(PIN_STEER_DIR1, inPin1);
-    digitalWrite(PIN_STEER_DIR2, inPin2);
-    analogWrite(PIN_STEER_SPEED, speed);
-  } else if (motor == MOTOR_DRIVE) {
-  	digitalWrite(PIN_DRIVE_STBY, HIGH); // Disable Standby/Sleep
-    digitalWrite(PIN_DRIVE_DIR1, inPin1);
-    digitalWrite(PIN_DRIVE_DIR2, inPin2);
-    analogWrite(PIN_DRIVE_SPEED, speed);
-  }
+	if (motor == MOTOR_STEER) {
+		digitalWrite(PIN_STEER_STBY, HIGH); // Disable Standby/Sleep
+		digitalWrite(PIN_STEER_DIR1, inPin1);
+		digitalWrite(PIN_STEER_DIR2, inPin2);
+		analogWrite(PIN_STEER_SPEED, speed);
+	} else if (motor == MOTOR_DRIVE) {
+		digitalWrite(PIN_DRIVE_STBY, HIGH); // Disable Standby/Sleep
+		digitalWrite(PIN_DRIVE_DIR1, inPin1);
+		digitalWrite(PIN_DRIVE_DIR2, inPin2);
+		analogWrite(PIN_DRIVE_SPEED, speed);
+	}
 }
 
 /*
