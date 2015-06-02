@@ -3,6 +3,8 @@
  
 #include <WProgram.h>
  
+const int dummy = 0;
+ 
 #define INSTRUCT_COMMAND_DRIVE_FORWARD 0
 #define INSTRUCT_COMMAND_DRIVE_REVERSE 1
 #define INSTRUCT_COMMAND_DRIVE_STOP 2
