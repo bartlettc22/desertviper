@@ -1,3 +1,3 @@
-[submodule "libraries/Arduino-HMC5883L"]
-	path = libraries/Arduino-HMC5883L
+[submodule "libraries/HMC5883L"]
+	path = libraries/HMC5883L
 	url = git@github.com:jarzebski/Arduino-HMC5883L.git
