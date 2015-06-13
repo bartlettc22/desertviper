@@ -40,24 +40,24 @@ void SController::run() {
   _potValue = analogRead(_POT);    // read the value from the sensor
 
   // If we're within x of goal, stop motors to lock wheels in this position
-  if ((_potValue >= (_statePotGoal - 10) && _potValue <= (_statePotGoal + 10)) {
+/*  if ((_potValue >= (_statePotGoal - 10) && _potValue <= (_statePotGoal + 10)) {
     setMBrake(400); // Full Brake to hold turn
   } else if(_potValue < _statePotGoal) {
     setMSpeed(-1 * (stateSpeed * 400));
   } else if(_potValue > _statePotGoal) {
     setMSpeed(-1 * (stateSpeed * 400));  
-  }
+  }*/
 }
 
-void turn(int Direction, float Amount, float Speed) {
+void SController::turn(int Direction, float Amount, float Speed) {
   _stateDirection = Direction;
   _stateAmount = Amount;
   _stateSpeed = Speed;
-  if(_stateDirection == TURN_DIRECTION_LEFT) {
+/*  if(_stateDirection == TURN_DIRECTION_LEFT) {
     _statePotGoal = ((int) round(Amount * (_POT_LEFT_MAX - _potCenter))) + _potCenter;
   } else if(_stateDirection == TURN_DIRECTION_RIGHT) {
     _statePotGoal = _potCenter - ((int) round(Amount * (_potCenter - _POT_RIGHT_MAX))) + ;
-  }  
+  }*/  
 }
 
 // Set speed for motor, speed is a number betwenn -400 and 400
