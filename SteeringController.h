@@ -21,15 +21,14 @@ class SController
     void turn(int Direction, float Amount, float Speed);    
     void setMSpeed(int speed); // Set speed (-400 to 400)
     void setMBrake(int brake); // Brake (-400 to 400)
-
-
-
+    int _potValue;
   private:
     unsigned char _INA1;
     unsigned char _INB1;
     unsigned char _PWM1;
     unsigned char _EN1DIAG1;
     unsigned char _POT;
+    bool command_changed = false;
 
     /*
       Potentiometer Edge Values (Right - Left)
@@ -38,9 +37,10 @@ class SController
       Wheels: ~352 - ~630
       Ideal: 380 - 610
     */
-    int const _POT_LEFT_MAX = 610;
-    int const _POT_RIGHT_MAX = 380;
-    int _potValue;
+    int const _POT_LEFT_MAX = 610; //688
+    int const _POT_RIGHT_MAX = 380; // 431
+    
+
     int _potCenter; // Center value - Calculated from right/left max
     int _potTick; // Potentiometer value for 1% turn
     int _stateDirection;
@@ -55,4 +55,8 @@ class SController
 extern SController SteeringController;
 
 #endif
+
+
+
+
 

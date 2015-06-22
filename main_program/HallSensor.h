@@ -17,7 +17,6 @@ class HSensor
   	float distanceTraveled();
   	int ticks;
   private:
-  	//void static _interrupt_process();
     unsigned char _DATA;	
     unsigned char _INTRPT;
 };
@@ -25,4 +24,8 @@ class HSensor
 extern HSensor HallSensor;
 
 #endif
+
+
+
+
 

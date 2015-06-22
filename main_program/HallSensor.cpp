@@ -1,6 +1,7 @@
 #include "HallSensor.h"
 
 void HSensor_interrupt() {
+
   HallSensor.ticks = HallSensor.ticks + 1;
 }
 
@@ -12,13 +13,15 @@ void HSensor::init(unsigned char DATA, unsigned char INTRPT)
   _DATA = DATA;
   _INTRPT = INTRPT;
 
+  // Set counter to 0
+  ticks = 0;
+
   // Set up interrupts
   attachInterrupt(_INTRPT, HSensor_interrupt, CHANGE);
 }
 
 void HSensor::run()
 {
-	
 }
 
 float HSensor::distanceTraveled() 

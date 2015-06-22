@@ -136,3 +136,7 @@ int8_t Timer::findFreeEventIndex(void)
 	}
 	return NO_TIMER_AVAILABLE;
 }
+
+
+
+

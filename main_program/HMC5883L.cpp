@@ -280,3 +280,7 @@ int16_t HMC5883L::readRegister16(uint8_t reg)
 
 
 
+
+
+
+

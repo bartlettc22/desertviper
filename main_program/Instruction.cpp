@@ -8,7 +8,7 @@ Instruction::Instruction(Ctrl &Controller, int type, int duration)
 }
 
 void Instruction::init() {
-	switch(_type) {
+	/*switch(_type) {
 		case TYPE_TURN_LEFT:
 			_Controller.turn(TURN_DIRECTION_LEFT, 1, 1);
 			break;
@@ -20,7 +20,7 @@ void Instruction::init() {
 
 	if(_duration > 0) {
 		startTime = millis();
-	}
+	}*/
 }
 
 void Instruction::run() {
@@ -33,3 +33,7 @@ bool Instruction::IsDone()
 {
   return isDone;
 }
+
+
+
+
