@@ -1,19 +1,21 @@
 # NodeJS Application for Desert Viper Dashboard
 
-## Install NodeJS on Windows
+## Installation/Setup 
+
+### Install NodeJS on Windows
 Download and install NodeJS from 
 ```
 https://nodejs.org/download/
 ```
 
-## Install NodeJS on Raspberry
+### Install NodeJS on Raspberry
 Download and install the latest NodeJS (ARM)
 ```
 wget http://node-arm.herokuapp.com/node_latest_armhf.deb
 sudo dpkg -i node_latest_armhf.deb
 ```
 
-## Setup Application
+### Setup Application
 Navigate to nodejs_app
 ```
 cd <project_directory>/desertviper/nodejs_app/
@@ -31,7 +33,7 @@ Install required modules (these are already specified in package.json file)
 npm install
 ```
 
-## General NodeJS Nodes
+### General NodeJS Nodes
 To initialize a new NodeJS app, run the following and complete setup questions
 ```
 npm init
