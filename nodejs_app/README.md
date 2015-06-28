@@ -5,7 +5,7 @@
 ### Install NodeJS on Windows
 Download and install NodeJS from https://nodejs.org/download/
 
-### Install NodeJS on Raspberry
+### Install NodeJS on Raspberry Pi
 Download and install the latest NodeJS (ARM)
 ```
 wget http://node-arm.herokuapp.com/node_latest_armhf.deb
@@ -17,7 +17,7 @@ Navigate to nodejs_app
 ```
 cd <project_directory>/desertviper/nodejs_app/
 ```
-In Linux, you may need to change the npm registry to the non-https version or some module installations may fail
+On Linux, you may need to change the npm registry to the non-https version or some module installations may fail
 ```
 npm config set registry http://registry.npmjs.org/
 ```
