@@ -39,3 +39,9 @@ To add a module run the following (the --save parameter saves the module as a de
 ```
 npm install <module_name> --save
 ```
+
+## Run application
+From app direction run
+```
+nodemon app.js
+```
