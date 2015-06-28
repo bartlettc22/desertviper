@@ -1,0 +1,14 @@
+﻿<Properties StartupItem="DesertViperListener\DesertViperListener.csproj">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="DesertViperListener\Program.cs">
+    <Files>
+      <File FileName="DesertViperListener\Main.cs" Line="1" Column="1" />
+      <File FileName="DesertViperListener\Program.cs" Line="57" Column="68" />
+      <File FileName="e:\Development\projects\Arduino-CmdMessenger\extras\CSharp\CommandMessenger\AsyncWorker.cs" Line="1" Column="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

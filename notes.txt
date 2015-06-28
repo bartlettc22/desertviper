@@ -1,0 +1,53 @@
+* Reset Raspberry Pi password (pi/raspberry)
+	* http://www.raspberrypi-spy.co.uk/2014/08/how-to-reset-a-forgotten-raspberry-pi-password/
+* Change Raspberry to US layout
+	* sudo vi /etc/default/keyboard -> change XKBLAYOUT="gb" to XKBLAYOUT="us"
+	* restart
+* Configure wifi
+	* sudo vi /etc/wpa_supplicant/wpa_supplicant.conf
+	* add: 
+		network={
+			ssid="<ssid>"
+			psk="<passkey>"
+		}
+	* sudo ifdown wlan0
+	* sudo ifup wlan0
+* Update package list
+	* sudo apt-get update	
+* Install/configure nodejs (Don't use apt-get, it is out of date)
+	* wget http://node-arm.herokuapp.com/node_latest_armhf.deb
+	* sudo dpkg -i node_latest_armhf.deb
+	* 
+	* mkdir ~/node_app
+	* cd ~/node_app
+	* npm init (answer questions to create initial package.json file)
+	* npm config set registry http://registry.npmjs.org/ (default is https which doesn't work for some reason)
+	* npm install express --save (installs express module and saves it as dependancy)
+* Install Mono (to run our C# Listener app)
+	* sudo apt-get install mono-complete
+* Install htop
+	* sudo apt-get install htop
+* Create NodeJS App	
+	* mkdir ~/node_app
+	* cd ~/node_app
+	* npm init (answer questions to create initial package.json file)
+	* npm config set registry http://registry.npmjs.org/ (default is https which doesn't work for some reason)
+	* npm install express --save (installs express module and saves it as dependancy)
+	* npm install jade --save
+	* npm instlal -g nodemon
+
+
+
+Changes/Findings
+* Didn't power pi with pins because that removes all protection according to many forums
+* GPIO didn't pull enough V/A to power stuff so powering everything through pi->usb out->arduino (usb in)
+* No decernable difference seen between low/high braking
+* During current tests, was able to peak at ~12A by trying to stop wheels when running full speed.  Normally didn't get above 2A without being on ground.  Estimates are probably high as the equation to calculate current is not exact.
+
+
+
+
+
+Tests/Calibrations/Configs
+* Determine lowest viable speed for drive motors (0-255)
+* Load (when on ground) current

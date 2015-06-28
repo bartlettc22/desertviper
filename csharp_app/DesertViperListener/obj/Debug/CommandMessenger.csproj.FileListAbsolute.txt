@@ -1,0 +1,5 @@
+E:\Development\projects\Arduino-CmdMessenger\extras\CSharp\CommandMessenger\bin\Debug\CommandMessenger.dll
+E:\Development\projects\Arduino-CmdMessenger\extras\CSharp\CommandMessenger\bin\Debug\CommandMessenger.pdb
+E:\Development\projects\Arduino-CmdMessenger\extras\CSharp\CommandMessenger\obj\Debug\CommandMessenger.csprojResolveAssemblyReference.cache
+E:\Development\projects\Arduino-CmdMessenger\extras\CSharp\CommandMessenger\obj\Debug\CommandMessenger.dll
+E:\Development\projects\Arduino-CmdMessenger\extras\CSharp\CommandMessenger\obj\Debug\CommandMessenger.pdb
