@@ -3,10 +3,7 @@
 ## Installation/Setup 
 
 ### Install NodeJS on Windows
-Download and install NodeJS from 
-```
-https://nodejs.org/download/
-```
+Download and install NodeJS from https://nodejs.org/download/
 
 ### Install NodeJS on Raspberry
 Download and install the latest NodeJS (ARM)
