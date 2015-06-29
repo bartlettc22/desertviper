@@ -1,10 +1,10 @@
-#pragma once
-
 // Libraries
 #include <Wire.h>
 #include <math.h>
 #include <string.h>
+#include "I2Cdev.h"
 #include "HMC5883L.h"
+#include "MPU6050.h"
 #include "QueueArray.h"
 #include "Event.h"
 #include "Timer.h"
@@ -13,8 +13,6 @@
 // Custom Libraries
 // #include "Messaging.h"
 #include "HallSensor.h"
-#include "Magnetometer.h"
-#include "RangeSensor.h"
 #include "Controller.h"
 //#include "Instruction.h"
 //#include "Program.h"
@@ -49,8 +47,6 @@ float distance_traveled = 0.0;
 //Ctrl Controller = Ctrl();
 void setup() {
 
-  //Messenger.init();
-
   // Begin serial communication at high speed 115200 bit/s
   Serial.begin(115200); 
   
@@ -63,8 +59,11 @@ void setup() {
   // Let the serial listener know that the Arduino has started
   cmdMessenger.sendCmd(kStatus,"Arduino has started!");
 
-  // Send logs to Raspberry every 500ms
+  // Send logs to Raspberry every Xms
   t.every(50, sendLog);
+
+  // Get range values every Xms
+  t.every(50, getSamples);
 
   // Start the loop timer
   loop_time = micros();
@@ -208,7 +207,7 @@ void sendLog()
   output.concat(":");   
   output.concat(Controller._rearFault);
   output.concat(":"); 
-  output.concat(digitalRead(PIN_RF_A));
+  output.concat(Controller._RF_A);
   output.concat(":");   
   output.concat(Controller._RF_B);  
   output.concat(":");   
@@ -216,7 +215,14 @@ void sendLog()
   output.concat(":");   
   output.concat(Controller._POT_RIGHT_MAX);   
   output.concat(":");   
-  output.concat(Controller._potCenter);       
+  output.concat(Controller._potCenter); 
+  output.concat(":");   
+  output.concat(Controller._rangeDistance);         
+  output.concat(":");   
+  output.concat(Controller._rangeDuration); 
+  output.concat(":");   
+  output.concat(Controller._heading); 
+           
   //output.concat(Controller._POT_RIGHT_MAX);
   //output.concat(":"); 
   //output.concat(Controller._potCenter);
@@ -231,6 +237,11 @@ void sendLog()
   loop_count = 0;
   loop_time = capture_time; 
   distance_traveled = capture_distance;
+}
+
+void getSamples() {
+  Controller.getRange();
+  Controller.getHeading();
 }
 
 /*

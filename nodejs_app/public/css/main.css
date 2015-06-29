@@ -57,6 +57,29 @@ p {
     line-height: 1.5;
 }
 
+::-webkit-scrollbar {
+	width: 8px;
+}
+::-webkit-scrollbar-button {
+	width: 8px;
+	height:5px;
+}
+::-webkit-scrollbar-track {
+	background:#eee;
+	border: thin solid lightgray;
+	box-shadow: 0px 0px 3px #dfdfdf inset;
+	border-radius:10px;
+}
+::-webkit-scrollbar-thumb {
+	background:#999;
+	border: thin solid gray;
+	border-radius:10px;
+}
+::-webkit-scrollbar-thumb:hover {
+	background:#7d7d7d;
+}	
+
+
 .bg-primary {
     background-color: #f05f40;
 }
@@ -92,8 +115,8 @@ aside {
 }
 
 .navbar-default .navbar-header .navbar-brand {
-    text-transform: uppercase;
-    font-family: 'Open Sans','Helvetica Neue',Arial,sans-serif;
+    /*text-transform: uppercase;*/
+    font-family: Consolas,'Open Sans','Helvetica Neue',Arial,sans-serif;
     font-weight: 700;
     color: #f05f40;
 }
@@ -542,4 +565,46 @@ body > .container-fluid {
 .fullCol {
 	margin-bottom:-9999px;
 	padding-bottom: 9999px;
+}
+
+.scrollable {
+	background-color: rgba(0,0,0,0.8);
+    overflow: auto;
+    width: 400px;
+    height: 360px;
+    padding: 5px 10px;
+}
+
+/*
+ * Custom Scrollbars 
+ * http://enscrollplugin.com
+*/
+.track3 {
+    width: 10px;
+    background: rgba(0, 0, 0, 0);
+    margin-right: 2px;
+    border-radius: 10px;
+    -webkit-transition: background 250ms linear;
+    transition: background 250ms linear;
+}
+
+.track3:hover,
+.track3.dragging {
+    background: #d9d9d9; /* Browsers without rgba support */
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.handle3 {
+    width: 7px;
+    right: 0;
+    background: #999;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 7px;
+    -webkit-transition: width 250ms;
+    transition: width 250ms;
+}
+
+.track3:hover .handle3,
+.track3.dragging .handle3 {
+    width: 10px;
 }

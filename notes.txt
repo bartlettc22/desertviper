@@ -14,15 +14,6 @@
 	* sudo ifup wlan0
 * Update package list
 	* sudo apt-get update	
-* Install/configure nodejs (Don't use apt-get, it is out of date)
-	* wget http://node-arm.herokuapp.com/node_latest_armhf.deb
-	* sudo dpkg -i node_latest_armhf.deb
-	* 
-	* mkdir ~/node_app
-	* cd ~/node_app
-	* npm init (answer questions to create initial package.json file)
-	* npm config set registry http://registry.npmjs.org/ (default is https which doesn't work for some reason)
-	* npm install express --save (installs express module and saves it as dependancy)
 * Install Mono (to run our C# Listener app)
 	* sudo apt-get install mono-complete
 * Install htop

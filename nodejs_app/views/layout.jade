@@ -10,6 +10,7 @@ html(ng-app="myApp")
     link(href="//netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css", rel="stylesheet")
     link(href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css", rel="stylesheet")
     link(href="css/bootstrap-switch.min.css", rel="stylesheet")
+    link(href="css/epoch.min.css", rel="stylesheet")
     link(href="css/main.css", rel="stylesheet")
   body#page-top
 
@@ -28,27 +29,49 @@ html(ng-app="myApp")
         #navbar.collapse.navbar-collapse
           ul.nav.navbar-nav.navbar-right
             li.active
-              a#nav-dashboard-link(href='#', onclick="toggleConsole()") Dashboard
+              a#nav-dashboard-link(href='#dashboard', onclick="toggleDashboard()") Dashboard
             li
-              a#nav-console-link(href='#', onclick="toggleDashboard()") Console
+              a#nav-remote-link(href='#remote', onclick="toggleRemote()") Remote              
+            li
+              a#nav-console-link(href='#console', onclick="toggleConsole()") Console
 
     // Page content
-    .container-fluid
+    .container-fluid(style="height: 0; overflow: hidden; padding-bottom: 75px; position: relative; width: 100%;")
       block content
     
     // Fixed footer
     footer.footer
       .container-fluid
-        div
-          .footer-stat-container.pull-left
-            span.footer-stat-name Runtime 
-            br
-            span.footer-stat-value#footer-runtime
-          .footer-stat-container.pull-left
-            span.footer-stat-name Frequency
-            br
-            span.footer-stat-value#footer-frequency
-
+        .row
+          .col-md-2
+            .footer-stat-container(style="padding-top:8px")
+              .button#socketio-control(style="cursor:pointer")
+                i.fa.fa-pause.fa-3x            
+          .col-md-2
+            .footer-stat-container
+              span.footer-stat-name Runtime 
+              br
+              span.footer-stat-value.stat#footer-runtime
+          .col-md-2
+            .footer-stat-container
+              span.footer-stat-name Frequency
+              br
+              span.footer-stat-value.stat#footer-frequency
+          .col-md-2
+            .footer-stat-container
+              span.footer-stat-name Range
+              br
+              span.footer-stat-value.stat#footer-range            
+          .col-md-2
+            .footer-stat-container
+              span.footer-stat-name Speed
+              br
+              span.footer-stat-value.stat#footer-speed            
+          .col-md-2
+            .footer-stat-container
+              span.footer-stat-name Heading
+              br
+              span.footer-stat-value.stat#footer-heading             
     //- Bootstrap core JavaScript
     //- ==================================================
     //- Placed at the end of the document so the pages load faster
@@ -59,11 +82,14 @@ html(ng-app="myApp")
     script(src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular-resource.min.js")
     script(src="https://cdn.socket.io/socket.io-1.3.5.js")
     script(src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.4.8/d3.js")
+    script(src='/js/enscroll.min.js')
     script(src='/js/jquery.canvasjs.min.js')
     script(src="/js/bootstrap-switch.min.js")
     script(src='/js/main.js')
     script(src="/js/charts.js")
     script(src="/js/socket.js")
+    script(src="/js/epoch.min.js")
+
     
     //-script(src='/js/sortable/ng-sortable.js')
     

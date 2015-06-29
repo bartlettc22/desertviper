@@ -1,9 +1,39 @@
 extends layout
 
 block content
-  div.row#dashboard(style="display:none")
-    div WhooHoo
-  div.row-fluid#console(style="height:100%")
+  div.container-fluid#dashboard(style="display:none")
+    div#gaugeChart.epoch.gauge-medium
+    div#dashboard-speed-value
+  div.container-fluid#remote(style="display:none; height: 0; overflow: hidden; padding:0px; position: relative; width: 100%;")
+    .row(style="height:30%")
+      .col-md-3
+      .col-md-2
+      .col-md-2 
+
+      .col-md-2 
+      .col-md-3
+    .row(style="height:40%")
+      .col-md-4
+      .col-md-4
+        .container-fluid#control-keys
+          .row
+            .col-md-4
+            .col-md-4(style="padding:20px")
+              button.btn.btn-default.btn-lg#control-key-up
+                i.fa.fa-arrow-up.fa-5x
+            .col-md-4
+          .row
+            .col-md-4(style="padding:20px")
+              button.btn.btn-default.btn-lg#control-key-left
+                i.fa.fa-arrow-left.fa-5x
+            .col-md-4(style="padding:20px")
+              button.btn.btn-default.btn-lg#control-key-down
+                i.fa.fa-arrow-down.fa-5x               
+            .col-md-4(style="padding:20px")
+              button.btn.btn-default.btn-lg#control-key-right
+                i.fa.fa-arrow-right.fa-5x
+      .col-md-4 
+  div.row-fluid#console(style="height:100%; display:none")
     div.col-md-3.fullCol
       .container-fluid.fullCol
         .console-stat-container(style="background-color: rgba(0,0,0,.8); height: 100%;")
@@ -11,67 +41,96 @@ block content
             span.console-stat-name
               | Wheel Ticks
             br
-            span.console-stat-value#console-ticks
+            span.console-stat-value.stat#console-ticks
           div
             span.console-stat-name
               | Front Current
             br
-            span.console-stat-value#console-front-motor-current   
+            span.console-stat-value.stat#console-front-motor-current   
           div
             span.console-stat-name
               | Rear Current
             br
-            span.console-stat-value#console-rear-motor-current        
+            span.console-stat-value.stat#console-rear-motor-current        
           div
             span.console-stat-name
               | Potentiometer
             br
-            span.console-stat-value#console-steering-pot  
+            span.console-stat-value.stat#console-steering-pot  
           div
             span.console-stat-name
               | Pot Left Max
             br
-            span.console-stat-value#console-steering-pot-left-max
+            span.console-stat-value.stat#console-steering-pot-left-max
           div
             span.console-stat-name
               | Pot Right Max
             br
-            span.console-stat-value#console-steering-pot-right-max
+            span.console-stat-value.stat#console-steering-pot-right-max
           div
             span.console-stat-name
               | Pot Center
             br
-            span.console-stat-value#console-steering-pot-center                   
+            span.console-stat-value.stat#console-steering-pot-center                   
           div
             button.btn.btn-default.btn-sm#commandCalibrate Calibrate
-          div.container-fluid
-            div.row
-              div.col-md-4
-              div.col-md-4
-                button.btn.btn-default.btn-lg(style="border-radius:2px;") &uarr;
-              div.col-md-4
-            div.row
-              div.col-md-3
-              div.col-md-5
-                div.btn-group
-                  button.btn.btn-default.btn-lg-btn-block(style="border-radius:2px") &larr;
-                  button.btn.btn-default.btn-lg(style="border-radius:2px") &darr;
-                  button.btn.btn-default.btn-lg(style="border-radius:2px") &rarr;
-              div.col-md-4
-    div.col-md-6.col
-      input#serialCommand
-      button#serialSubmit Submit
-      h1. Home
-      | Send Command 
 
-      br
-      button#commandDriveForward Forward
-      input(type="checkbox" id="toggle-serial" name="toggle-serial" checked)
-      br
-      textarea#sockout(cols="20", rows="10")
-      textarea#sockin(cols="60", rows="10")
-      br
-      textarea#socklog(cols="120", rows="20")
+          div
+            span.console-stat-name
+              | Range Duration
+            br
+            span.console-stat-value.stat#console-range-duration
+
+          div
+            span.console-stat-name
+              | Range Distance
+            br
+            span.console-stat-value.stat#console-range-distance    
+
+          div
+            span.console-stat-name
+              | RF A
+            br
+            span.console-stat-value.stat#console-rf-a 
+
+          div
+            span.console-stat-name
+              | RF B
+            br
+            span.console-stat-value.stat#console-rf-b                                          
+          //  div.container-fluid
+              div.row
+                div.col-md-4
+                div.col-md-4
+                  button.btn.btn-default.btn-lg(style="border-radius:2px;") &uarr;
+                div.col-md-4
+              div.row
+                div.col-md-3
+                div.col-md-5
+                  div.btn-group
+                    button.btn.btn-default.btn-lg-btn-block(style="border-radius:2px") &larr;
+                    button.btn.btn-default.btn-lg(style="border-radius:2px") &darr;
+                    button.btn.btn-default.btn-lg(style="border-radius:2px") &rarr;
+                div.col-md-4
+    div.col-md-6.col
+      .container-fluid
+        .row
+          .col-md-4
+            .h3 Inputs to Arduino
+            input#serialCommand
+            button#serialSubmit Submit
+            br
+            button#commandDriveForward Forward
+            input(type="checkbox" id="toggle-serial" name="toggle-serial" checked)
+            br
+            div.stat.scrollable#sockout(style="width:150px")
+          .col-md-6
+            .h3 Output from Arduino
+            div.stat.scrollable#sockin(style="width:400px")
+        .row
+          .col-md-12
+            .h3 Raw Data Logs from Arduino (Last 30 seconds)
+            div.stat.scrollable#socklog(style="width:100%")
     div.col-md-3.col
       .console-ctrl-container(style="background-color: rgba(0,0,0,.8)")
         .h3 Motor Config
@@ -90,10 +149,11 @@ block content
         div.container-fluid
           div.row
             div.col-md-8
-              #motor-speed-slider
+              #motor-speed-slider(style="padding-top:5px")
             div.col-md-4
-              input#motor-speed-value(size="3", disabled)
-              | %
+              .input-group
+                input.form-control#motor-speed-value(size="2", width="10", disabled, style="color:#f05f40")
+                .input-group-addon %
         .hr
 
 

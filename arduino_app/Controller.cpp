@@ -7,10 +7,10 @@ void RF_interrupt() {
 
 void Ctrl::init()
 {
+
   // Steering
   pinMode(PIN_STEER_PWM, OUTPUT);
   pinMode(PIN_STEER_POT, INPUT);
-
 
   // Main Motor Controls
   pinMode(PIN_MOTOR_INA1, OUTPUT);
@@ -34,20 +34,34 @@ void Ctrl::init()
   HallSensor.init(PIN_HALL, INRPT_HALL);
 
   // Initialize RF Receiver Interrupts
-  pinMode(PIN_RF_A, INPUT);
-  pinMode(PIN_RF_B, INPUT);
+  //pinMode(PIN_RF_A, INPUT);
+  //pinMode(PIN_RF_B, INPUT);
   attachInterrupt(INRPT_RF, RF_interrupt, CHANGE);
   //attachInterrupt(INRPT_RF_A, RF_A_interrupt, CHANGE);
   //attachInterrupt(INRPT_RF_B, RF_B_interrupt, CHANGE);
 
-  //Compass.init();
-  //RangeSensor.init(PIN_RANGE_TRIG, PIN_RANGE_ECHO);
-  //CalibrateSteering();
+  // Initialize I2C Communication
+  Wire.begin();
+
+  // Initialize Accelerometer
+  accelgyro.initialize();
+  accelgyro.setI2CBypassEnabled(true);
+
+  // Initialize Compass
+  compass.initialize();
+
+  // Initialize Range Finder, sent Trigger to LOW (initial) state
+  pinMode(PIN_RANGE_TRIG, OUTPUT);
+  pinMode(PIN_RANGE_ECHO, INPUT); 
+  digitalWrite(PIN_RANGE_TRIG, LOW); 
 }
 
 void Ctrl::run()
 {
+  // Check on Steering
   checkSteering();
+
+  // Check on Motors
   checkDrive();
 }
 
@@ -56,18 +70,18 @@ void Ctrl::checkSteering() {
   _potValue = analogRead(PIN_STEER_POT);
   //Serial.println(_potValue);
   // If we're within x of goal, stop motors to lock wheels in this position
-  if (_potValue >= (_potGoal - 10) && _potValue <= (_potGoal + 10)) {
+  //if (_potValue >= (_potGoal - 10) && _potValue <= (_potGoal + 10)) {
     //setMBrake(400); // Full Brake to hold turn
     //setSteerBrake();
     //Serial.println("Stopping, within goal");
 
-  } else if(_potValue < _potGoal) {
+ // } else if(_potValue < _potGoal) {
     //Serial.println("Stopping, within goal");
-    //setMSpeed(-1 * (stateSpeed * 400));
-  } else if(_potValue > _potGoal) {
+  //  //setMSpeed(-1 * (stateSpeed * 400));
+  //} else if(_potValue > _potGoal) {
     //Serial.println("Stopping, within goal");
     //setMSpeed(-1 * (stateSpeed * 400));  
-  }
+  //}
 }
 
 
@@ -179,8 +193,26 @@ void Ctrl::CalibrateSteering() {
 
 }
 
+void Ctrl::getRange() {
+
+  //delayMicroseconds(2); // Added this line
+  digitalWrite(PIN_RANGE_TRIG, HIGH);
+  delayMicroseconds(2000); // Added this line
+  digitalWrite(PIN_RANGE_TRIG, LOW);
+  _rangeDuration = pulseIn(PIN_RANGE_ECHO, HIGH);
+  _rangeDistance = (_rangeDuration/2) / 29.1;
+  
+}
+
+void Ctrl::getHeading() {
+
+  compass.getHeading(&_headingX, &_headingY, &_headingZ);
+  
+  // To calculate heading in degrees. 0 degree indicates North
+  _heading = atan2(_headingY, _headingX);
+  if(_heading < 0)
+    _heading += 2 * M_PI;
+  _heading = _heading * 180/M_PI;
+}
+
 Ctrl Controller = Ctrl();
-
-
-
-

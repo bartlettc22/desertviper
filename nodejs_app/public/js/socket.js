@@ -10,37 +10,58 @@ var DRIVE_DIRECTION_FORWARD  =   0;
 var DRIVE_DIRECTION_REVERSE  =   1;
 var DRIVE_DIRECTION_COAST    =   2;
 var DRIVE_DIRECTION_BRAKE_LOW =  3;
+var maxLogs = 600;
+var logCounter = 0;
+var isPaused = false;
 
 // This event is sent by NodeJS as a response to received command
 socket.on('socketFeedback', function (data) {
-	$('#sockin').prepend(data.message+"\n"); 
+	if(!isPaused) {
+		$('#sockin').prepend(data.message+"\n"); 
+	}
 });
 
 socket.on('serialData', function (data) {
-	
-	//  The first item is the command and the second is the data/arguments
-	var dataParts = data.split(",");
+	if(!isPaused) {
+		//  The first item is the command and the second is the data/arguments
+		var dataParts = data.split(",");
 
-	// If log file, output to log output, otherwise output to command output
-	if(dataParts[0] == serialCommands['kLog']) {
-		//$('#socklog').prepend(dataParts[1]);
-		var logParts = dataParts[1].split(":");
+		// If log file, output to log output, otherwise output to command output
+		if(dataParts[0] == serialCommands['kLog']) {
+			
+			$('#socklog').prepend($('<span>'+dataParts[1]+'</span>'));
+			if(logCounter >= maxLogs) {
+				$('#socklog span:last-child').remove();
+			}
+			var logParts = dataParts[1].split(":");
 
-		// Set values on page
-		$('#footer-runtime').html((logParts[0]/1000).toFixed(2) + ' sec');
-		$('#footer-frequency').html(logParts[1] + ' Hz');
-		$('#console-steering-pot').html(logParts[2]);
-		$('#console-ticks').html(logParts[3]);
-		$('#console-front-motor-current').html(logParts[5] + ' mA');
-		$('#console-rear-motor-current').html(logParts[7] + ' mA');
+			// Set values on page
+			$('#footer-runtime').html((logParts[0]/1000).toFixed(2) + ' sec');
+			$('#footer-frequency').html(logParts[1] + ' Hz');
+			$('#console-steering-pot').html(logParts[2]);
+			$('#console-ticks').html(logParts[3]);
+			$('#console-front-motor-current').html(logParts[5] + ' mA');
+			$('#console-rear-motor-current').html(logParts[7] + ' mA');
+			$('#dashboard-speed-value').html(logParts[8] + ' cm/s');
+			$('#footer-speed').html(logParts[8] + ' cm/s');
+			myChart.push(logParts[8]);
+			$('#console-rf-a').html(logParts[14]);
+			$('#console-rf-b').html(logParts[15]);			
+			$('#console-steering-pot-left-max').html(logParts[16]);
+			$('#console-steering-pot-right-max').html(logParts[17]);
+			$('#console-steering-pot-center').html(logParts[18]);
+			$('#console-range-distance').html(logParts[19] + ' cm');
+			$('#footer-range').html(logParts[19] + ' cm');		
+			$('#console-range-duration').html(logParts[20] + ' &micro;s');
 
-		$('#console-steering-pot-left-max').html(logParts[16]);
-		$('#console-steering-pot-right-max').html(logParts[17]);
-		$('#console-steering-pot-center').html(logParts[18]);
-		
 
-	} else {
-		$('#sockin').prepend(data); 
+
+			$('#footer-heading').html(logParts[21]);
+			
+			logCounter++;
+		} else {
+			$('#sockin').prepend(data.replace(/(?:\r\n|\r|\n)/g, '<br />'));
+		}
 	}
 /*	var entry = [];
 	
@@ -58,7 +79,9 @@ socket.on('serialData', function (data) {
 });
 
 socket.on('commandSent', function (data) {
-	$('#sockout').prepend(data.command);
+	if(!isPaused) {
+		$('#sockout').prepend(data.command);
+	}
 });
 
 
@@ -100,25 +123,35 @@ $(function() {
 	    switch(e.which) {
 	        case 37: // left
 	        	turn(TURN_DIRECTION_LEFT, 1, 1);
+	        	$("#control-key-left").addClass("active");
 	        break;
 
 	        case 38: // up
 	        	drive(DRIVE_DIRECTION_FORWARD);
+	        	$("#control-key-up").addClass("active");
 	        break;
 
 	        case 39: // right
 	        	turn(TURN_DIRECTION_RIGHT, 1, 1);
+	        	$("#control-key-right").addClass("active");
 	        break;
 
 	        case 40: // down
 	        	drive(DRIVE_DIRECTION_REVERSE);
+	        	$("#control-key-down").addClass("active");
 	        break;
+
 	    	case 67: // c
 				toggleConsole();	    		
 	    	break;
+
 	    	case 68: // d
 				toggleDashboard();	    	
 	    	break;
+
+	    	case 82: // r
+				toggleRemote();	    	
+	    	break;	    	
 
 	        default: return; // exit this handler for other keys
 	    }
@@ -130,18 +163,22 @@ $(function() {
 	    switch(e.which) {
 	        case 37: // left
 	        	turn(TURN_DIRECTION_BRAKE, 1, 1);
+	        	$("#control-key-left").removeClass("active");
 	        break;
 
 	        case 38: // up
 	        	drive(DRIVE_DIRECTION_BRAKE_LOW);
+	        	$("#control-key-up").removeClass("active");
 	        break;
 
 	        case 39: // right
 	        	turn(TURN_DIRECTION_BRAKE, 1, 1);
+	        	$("#control-key-right").removeClass("active");
 	        break;
 
 	        case 40: // down
 	        	drive(DRIVE_DIRECTION_BRAKE_LOW);
+	        	$("#control-key-down").removeClass("active");
 	        break;
 
 	        default: return; // exit this handler for other keys

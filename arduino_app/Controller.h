@@ -3,19 +3,13 @@
 
 // Libraries
 #include <Arduino.h>
+#include "I2Cdev.h"
 #include "HMC5883L.h"
+#include "MPU6050.h"
 #include <math.h>
 
 // Custom Libraries
-//#include "MotorController.h"
-//#include "SteeringController.h"
 #include "HallSensor.h"
-#include "Magnetometer.h"
-#include "RangeSensor.h"
-
-// On-board LED
-//#define PIN_LED             13
-//#define CYCLE_MOD           1000
 
 // Motor Controller PINs
 // Motor 1 = Rear Wheels
@@ -38,9 +32,9 @@
 // RF Receiver
 #define PIN_RF        3 // RF Receiver VT - Any button pressed
 #define INRPT_RF      1 
-#define PIN_RF_A      A14 // RF Receiver D2
+#define PIN_RF_A      19 // RF Receiver D2
 #define INRPT_RF_A    4 
-#define PIN_RF_B      26 // RF Receiver D0
+#define PIN_RF_B      18 // RF Receiver D0
 #define INRPT_RF_B    5 
 //#define INRPT_RF_C   0 // RF Receiver D3
 //#define INRPT_RF_D   0 // RF Receiver D1
@@ -53,8 +47,8 @@
 #define PIN_STEER_POT          15   // Steering Motor Position Potentiometer
 
 // Range Sensor
-//#define PIN_RANGE_TRIG   3
-//#define PIN_RANGE_ECHO   4
+#define PIN_RANGE_TRIG   46
+#define PIN_RANGE_ECHO   47
 
 // Steering Motor Globals
 #define TURN_DIRECTION_BRAKE    0
@@ -110,11 +104,18 @@ class Ctrl
 
     void checkSteering();
     void checkDrive();
+    void getRange();
+    void getHeading();
+
     int _potValue;
     int _frontCurrent;
     bool _frontFault;
     int _rearCurrent;
     bool _rearFault;
+
+    // Range sensor readings
+    unsigned int _rangeDuration;
+    double _rangeDistance;
 
     /*
       Potentiometer Edge Values (Right - Left)
@@ -135,14 +136,17 @@ class Ctrl
     // RF Receiver
     volatile bool _RF_A = false;
     volatile bool _RF_B = false;
+
+    // Compass
+    int16_t _headingX;
+    int16_t _headingY;
+    int16_t _headingZ;
+    float _heading;
+
+    HMC5883L compass;
+    MPU6050 accelgyro;
   private:
 
-  	// Peripherals
-  	/*HSensor HallSensor;*/
-  	//Magnetometer Compass;
-  	/*RSensor RangeSensor;
-    SController SteeringController;
-  	MController MotorController;*/
     int _potGoal;
     bool _turn_command_changed;
 };
@@ -150,9 +154,3 @@ class Ctrl
 extern Ctrl Controller;
 
 #endif
-
-
-
-
-
-

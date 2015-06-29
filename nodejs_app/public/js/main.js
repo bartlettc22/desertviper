@@ -53,6 +53,15 @@ var count
 
 $(function() {
 
+  // Default location (specified by hash)
+  if(location.hash == '#dashboard') {
+    toggleDashboard();
+  } else if(location.hash == '#remote') {
+    toggleRemote();
+  } else {
+    toggleConsole();
+  }
+
   $("#toggle-serial").bootstrapSwitch();
   $("#motor-speed-slider").slider({
     value: 100,
@@ -60,6 +69,33 @@ $(function() {
     min:0,
     create: function( event, ui ) { $('#motor-speed-value').val(100); },
     change: function( event, ui ) { $('#motor-speed-value').val(ui.value); }
+  });
+
+  // Scrolling Divs
+  $('.scrollable').enscroll({
+    showOnHover: true,
+    verticalTrackClass: 'track3',
+    verticalHandleClass: 'handle3'
+  });
+
+  // Play/Pause
+  $('#socketio-control').click(function() {
+    if(isPaused) {
+      $(this).children('i').removeClass('fa-play');
+      $(this).children('i').addClass('fa-pause');
+    } else {
+      $(this).children('i').removeClass('fa-pause');
+      $(this).children('i').addClass('fa-play');
+    }
+    isPaused = !isPaused;
+  });
+
+  // Charts
+  myChart = $('#gaugeChart').epoch({
+    type: 'time.gauge',
+    value: 500,
+    domain: [0, 1000],
+    format: function(v) { return (v).toFixed(2) + ' cm/s'; }
   });
   
  /*var dps = []; // dataPoints
@@ -108,16 +144,33 @@ updateChart = function (count, value) {
 
 });
 
-function toggleConsole() {
-  $('#nav-dashboard-link').parent().removeClass('active');
-  $('#nav-console-link').parent().addClass('active');
-  $('#dashboard').hide();
-  $('#console').fadeIn('slow');
-}
-
 function toggleDashboard() {
   $('#nav-console-link').parent().removeClass('active');
+  $('#nav-remote-link').parent().removeClass('active');
   $('#nav-dashboard-link').parent().addClass('active');
   $('#console').hide();
+  $('#remote').hide();
   $('#dashboard').fadeIn('slow');
+  location.hash = '#dashboard';
 }
+
+function toggleRemote() {
+  $('#nav-console-link').parent().removeClass('active');
+  $('#nav-dashboard-link').parent().removeClass('active');
+  $('#nav-remote-link').parent().addClass('active');
+  $('#console').hide();
+  $('#dashboard').hide();
+  $('#remote').fadeIn('slow');
+  location.hash = '#remote';
+}
+
+function toggleConsole() {
+  $('#nav-dashboard-link').parent().removeClass('active');
+  $('#nav-remote-link').parent().removeClass('active');
+  $('#nav-console-link').parent().addClass('active');
+  $('#dashboard').hide();
+  $('#remote').hide();
+  $('#console').fadeIn('slow');
+  location.hash = '#console';
+}
+
