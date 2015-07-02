@@ -21,9 +21,10 @@ On Linux, you may need to change the npm registry to the non-https version or so
 ```
 npm config set registry http://registry.npmjs.org/
 ```
-Install Nodemon globally (-g).  This will keep our application up if there are errors or if we change files. May need to run as sudo on Linux
+Install Nodemon and Bower globally (-g).  This will keep our application up if there are errors or if we change files. May need to run as sudo on Linux
 ```
 npm install -g nodemod
+npm install -g bower
 ```
 Install required modules (these are already specified in package.json file)
 ```
