@@ -35,10 +35,12 @@ npm install
 To initialize a new NodeJS app, run the following and complete setup questions
 ```
 npm init
+bower init
 ```
 To add a module run the following (the --save parameter saves the module as a dependancy in package.json)
 ```
 npm install <module_name> --save
+bower intstall <module_name>
 ```
 
 ## Run application
