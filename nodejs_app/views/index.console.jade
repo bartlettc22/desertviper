@@ -1,0 +1,49 @@
+.col-md-3(style="height:100%")
+  .console-stat-container(style="background-color: rgba(0,0,0,.8); height: 100%;")
+    .row(style="height:80%")
+      .h3 Configuration Settings
+      .col-md-12(style="text-align:left")
+        pre config = {{config | json}}
+        pre settings = {{settings | json}}
+
+.col-md-3(style="height:100%")
+  .console-stat-container(style="background-color: rgba(0,0,0,.8); height: 100%;")
+    .row(style="height:80%")
+      .h3 Application Settings
+      .col-md-12(style="text-align:left")
+        .row
+          .col-md-6
+            div Log Sample Rate
+            .form-inline
+              .form-group
+                .input-group.input-group-xs
+                  input#config-log-speed.form-control(type='text', placeholder='', value='50', ng-model="config.logSpeed", ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }")
+                  .input-group-addon ms
+
+.col-md-6(style="height: 100%;")
+  .container-fluid.dashblock(style="height: 100%;")
+    
+    .row(style="height:10%")
+      .col-md-12
+          .h3 Communication / Log
+          br 
+          div(style="text-align:left")
+            form.form-inline
+              .form-group
+                label.sr-only(for='serialCommand') Manual Command
+                input#serialCommand.col-md-6.form-control(type='text', placeholder='Manual Command')
+              | &nbsp;&nbsp;&nbsp;
+              button.btn.btn-primary#serialSubmit(type='submit') Submit to Arduino     
+    .row(style="height:40%")
+      .col-md-3
+        .h3 Input to Arduino
+        .stat.scrollable2#sockout(style="text-align:left")
+      .col-md-9
+        .h3 Output from Arduino
+        div(style="position:relative; height:100%")
+          .stat.scrollable2#sockin(style="text-align:left")     
+    .row(style="height:50%")
+      .col-md-12
+        .h3 Raw Data Logs from Arduino (Last 30 seconds)
+        div(style="position:relative; height:100%")
+          .stat.scrollable#socklog(style="text-align:left")

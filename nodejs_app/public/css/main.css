@@ -17,7 +17,7 @@ body {
 }
 
 body {
-    font-family: Consolas, Merriweather,'Helvetica Neue',Arial,sans-serif;
+    font-family: 'Open Sans', Merriweather,'Helvetica Neue',Arial,sans-serif;
 }
 
 hr {
@@ -48,14 +48,11 @@ h3,
 h4,
 h5,
 h6 {
-    font-family: 'Open Sans','Helvetica Neue',Arial,sans-serif;
+    font-family: 'Open Sans', Merriweather,'Helvetica Neue',Arial,sans-serif;
 }
 
-p {
-    margin-bottom: 20px;
-    font-size: 16px;
-    line-height: 1.5;
-}
+
+
 
 ::-webkit-scrollbar {
 	width: 8px;
@@ -536,7 +533,8 @@ body > .container-fluid {
 	color:#ccc;
 }
 
-.footer-stat-value {
+.footer-stat-value,
+.footer-stat-unit {
 	font-size:1.8em;
 }
 
@@ -560,6 +558,7 @@ body > .container-fluid {
 
 .stat {
 	color: #f05f40;
+    font-family: "Lucida Console", Monaco, monospace;
 }
 
 .fullCol {
@@ -567,44 +566,61 @@ body > .container-fluid {
 	padding-bottom: 9999px;
 }
 
-.scrollable {
-	background-color: rgba(0,0,0,0.8);
+.dashblock {
+    background-color: rgba(0,0,0,0.8);
+    width:100%; 
+    padding:15px;
+}
+
+.dashblock2 {
+    background-color: rgba(0,0,0,0.8);
+    padding:15px;
+}
+
+.scrollable, 
+.scrollable2 {
     overflow: auto;
-    width: 400px;
+    width: 100%;
     height: 360px;
-    padding: 5px 10px;
+    padding: 0 5px;
 }
 
-/*
- * Custom Scrollbars 
- * http://enscrollplugin.com
-*/
-.track3 {
-    width: 10px;
-    background: rgba(0, 0, 0, 0);
-    margin-right: 2px;
-    border-radius: 10px;
-    -webkit-transition: background 250ms linear;
-    transition: background 250ms linear;
+.scrollable {
+    height: 360px;
 }
 
-.track3:hover,
-.track3.dragging {
-    background: #d9d9d9; /* Browsers without rgba support */
-    background: rgba(255, 255, 255, 0.2);
+.scrollable2 {
+    height: 250px; 
 }
 
-.handle3 {
-    width: 7px;
-    right: 0;
-    background: #999;
-    background: rgba(255, 255, 255, 0.4);
-    border-radius: 7px;
-    -webkit-transition: width 250ms;
-    transition: width 250ms;
+.rf-off {
+  color: rgba(100,100,100,0.5); 
+}
+.rf-on {
+  color: rgba(70, 136, 71, 0.7); 
+}
+.rf-border {
+  color: rgba(100,100,100,1); 
 }
 
-.track3:hover .handle3,
-.track3.dragging .handle3 {
-    width: 10px;
+
+.slider .slider-handle {
+    background: #f05f40;
+}
+
+    .input-xs {
+    height: 22px;
+    padding: 2px 5px;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 3px;
+    }
+
+    .input-group-xs>.form-control,
+.input-group-xs>.input-group-addon,
+.input-group-xs>.input-group-btn>.btn {
+    height: 22px;
+    padding: 1px 5px;
+    font-size: 12px;
+    line-height: 1.5;
 }

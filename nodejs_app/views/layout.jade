@@ -6,11 +6,12 @@ html(ng-app="myApp")
     meta(http-equiv='X-UA-Compatible', content='IE=edge')
     meta(name='viewport', content='width=device-width, initial-scale=1')
     link(rel="shortcut icon" href="/images/pear.ico")
-    link(href="//code.jquery.com/ui/1.11.4/themes/overcast/jquery-ui.css", rel="stylesheet")
-    link(href="//netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css", rel="stylesheet")
-    link(href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css", rel="stylesheet")
+    link(href="/bower_components/bootstrap/dist/css/bootstrap.min.css", rel="stylesheet")
+    link(href="/bower_components/fontawesome/css/font-awesome.min.css", rel="stylesheet")
+    link(href="/bower_components/seiyria-bootstrap-slider/css/bootstrap-slider.css", rel="stylesheet")
+    link(href='http://fonts.googleapis.com/css?family=Open+Sans', rel='stylesheet', type='text/css')
+    link(href='http://fonts.googleapis.com/css?family=Orbitron', rel='stylesheet', type='text/css')
     link(href="css/bootstrap-switch.min.css", rel="stylesheet")
-    link(href="css/epoch.min.css", rel="stylesheet")
     link(href="css/main.css", rel="stylesheet")
   body#page-top
 
@@ -33,67 +34,105 @@ html(ng-app="myApp")
             li
               a#nav-remote-link(href='#remote', onclick="toggleRemote()") Remote              
             li
+              a#nav-sensor-link(href='#sensors', onclick="toggleSensors()") Sensors                
+            li
               a#nav-console-link(href='#console', onclick="toggleConsole()") Console
 
     // Page content
-    .container-fluid(style="height: 0; overflow: hidden; padding-bottom: 75px; position: relative; width: 100%;")
+    .container-fluid(style="height: 0; overflow: hidden; padding-bottom: 75px; position: relative; width: 100%;", ng-controller="configController")
       block content
     
     // Fixed footer
     footer.footer
       .container-fluid
         .row
-          .col-md-2
+          .col-md-1
             .footer-stat-container(style="padding-top:8px")
               .button#socketio-control(style="cursor:pointer")
-                i.fa.fa-pause.fa-3x            
+                i.fa.fa-pause.fa-3x  
           .col-md-2
-            .footer-stat-container
-              span.footer-stat-name Runtime 
-              br
-              span.footer-stat-value.stat#footer-runtime
-          .col-md-2
-            .footer-stat-container
-              span.footer-stat-name Frequency
-              br
-              span.footer-stat-value.stat#footer-frequency
-          .col-md-2
-            .footer-stat-container
-              span.footer-stat-name Range
-              br
-              span.footer-stat-value.stat#footer-range            
-          .col-md-2
-            .footer-stat-container
-              span.footer-stat-name Speed
-              br
-              span.footer-stat-value.stat#footer-speed            
-          .col-md-2
-            .footer-stat-container
-              span.footer-stat-name Heading
-              br
-              span.footer-stat-value.stat#footer-heading             
-    //- Bootstrap core JavaScript
-    //- ==================================================
+            .row
+              .col-md-12(style="font-size:1.2em; padding-top:5px; text-align:left")
+                span Socket:&nbsp;&nbsp;
+                span.text-success#socket-connected(style="font-weight:bold") Connected
+                span.text-danger#socket-disconnected(style="font-weight:bold; display:none") Disconnected
+            .row
+              .col-md-12(style="font-size:1.2em; text-align:left")
+                span Arduino:&nbsp;
+                span.text-success#serial-connected(style="font-weight:bold") Connected
+                span.text-danger#serial-disconnected(style="font-weight:bold; display:none") Disconnected
+                  //
+                    span(style="color:#fff; font-weight:normal; font-size:0.8em; padding-left:3px")
+                      a(href="#" onclick="return false;")
+                        i.fa.fa-refresh
+          .col-md-9
+            .row(style="padding-top:4px")
+              .col-md-2
+                .footer-stat-container
+                  .row
+                    .col-md-12
+                      span.footer-stat-name Runtime 
+                  .row
+                    .col-md-12
+                      span.footer-stat-value.stat#footer-runtime
+              .col-md-2
+                .footer-stat-container
+                  .row
+                    .col-md-12
+                      span.footer-stat-name Frequency
+                  .row
+                    .col-md-12
+                      span.footer-stat-value.stat#footer-frequency                      
+              .col-md-2
+                .footer-stat-container
+                  .row
+                    .col-md-12
+                      span.footer-stat-name Range
+                  .row
+                    .col-md-12
+                      span.footer-stat-value.stat#footer-range            
+              .col-md-2
+                .footer-stat-container
+                  .row
+                    .col-md-12
+                      span.footer-stat-name Speed
+                  .row
+                    .col-md-12                      
+                      span.footer-stat-value.stat#footer-speed            
+              .col-md-2
+                .footer-stat-container
+                  .row
+                    .col-md-12
+                      span.footer-stat-name Heading
+                  .row
+                    .col-md-12  
+                      span.footer-stat-value.stat#footer-heading                                         
+              .col-md-2
+                .row
+                  .col-md-12(style="font-size:1.2em; padding-top:5px; text-align:left")
+                    span <i class="fa fa-bolt"></i> Front:&nbsp;&nbsp;
+                    span.text-success#footer-front-motor-fault-healthy(style="font-weight:bold") Healthy
+                    span.text-danger#footer-front-motor-fault(style="font-weight:bold; display:none") Fault!
+                .row
+                  .col-md-12(style="font-size:1.2em; text-align:left")
+                    span <i class="fa fa-bolt"></i> Rear:&nbsp;
+                    span.text-success#footer-rear-motor-fault-healthy(style="font-weight:bold") Healthy
+                    span.text-danger#footer-rear-motor-fault(style="font-weight:bold; display:none") Fault!                          
+                      
+
+
     //- Placed at the end of the document so the pages load faster
-    script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js')
-    script(src="//code.jquery.com/ui/1.11.4/jquery-ui.js")
-    script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js') 
-    script(type="text/javascript", src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular.min.js")
-    script(src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular-resource.min.js")
-    script(src="https://cdn.socket.io/socket.io-1.3.5.js")
-    script(src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.4.8/d3.js")
-    script(src='/js/enscroll.min.js')
+    script(src="/bower_components/jquery/dist/jquery.min.js")
+    script(src="/bower_components/angular/angular.min.js")
+    script(src="/bower_components/bootstrap/dist/js/bootstrap.min.js")
+    script(src="/bower_components/socket.io-client/socket.io.js")
+    script(src="/bower_components/d3/d3.min.js")
+    script(src="/bower_components/underscore/underscore-min.js")
+    script(src="/bower_components/seiyria-bootstrap-slider/js/bootstrap-slider.js")
+    
+
     script(src='/js/jquery.canvasjs.min.js')
     script(src="/js/bootstrap-switch.min.js")
     script(src='/js/main.js')
     script(src="/js/charts.js")
     script(src="/js/socket.js")
-    script(src="/js/epoch.min.js")
-
-    
-    //-script(src='/js/sortable/ng-sortable.js')
-    
-    //- script(type="text/javascript", src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular-route.min.js")
-    //-script(type="text/javascript", src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular-resource.min.js")
-    //-script(type="text/javascript", src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular-sanitize.min.js")
-    

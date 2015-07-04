@@ -9,10 +9,13 @@
 #include "Event.h"
 #include "Timer.h"
 #include "CmdMessenger.h"
+#include "Kalman.h"
+#include "SFE_BMP180.h"
 
 // Custom Libraries
 // #include "Messaging.h"
-#include "HallSensor.h"
+
+// #include "HallSensor.h"
 #include "Controller.h"
 //#include "Instruction.h"
 //#include "Program.h"
@@ -34,18 +37,52 @@ enum
   kLog,
   kDrive,
   kCalibrate,
-  kTurn
+  kTurn,
+  kSetConfig
 };
+
+// Configs
+enum
+{
+  kLogSpeed,
+  kHeadingSampleRate,
+  kFrontMotorRamp,
+  kRearMotorRamp,
+  kTickDistance,
+  kSpeedOfSound, 
+  kRangeMin, 
+  kRangeMax,
+  kRangeSampleRate,
+  kPressureSampleRate,
+  kDegreeCorrection  
+};
+
+struct {
+    int ival;
+    float fval;
+    char cval;
+} config[2];
+
+// Implement varying config types using a "tagged union"
+
 
 // Temporary variables
 int j = 0;
 
 unsigned long loop_time; 
 unsigned long loop_count = 0;
-float distance_traveled = 0.0;   
+float distance_traveled = 0.0; 
+
+int timerLog;  
+int timerHeadingSample;
+int timerRangeSample;
+int timerPressureSample;
 //Prog Program = Prog();
 //Ctrl Controller = Ctrl();
 void setup() {
+
+  // 
+  config[kLogSpeed].ival = 50;
 
   // Begin serial communication at high speed 115200 bit/s
   Serial.begin(115200); 
@@ -60,10 +97,16 @@ void setup() {
   cmdMessenger.sendCmd(kStatus,"Arduino has started!");
 
   // Send logs to Raspberry every Xms
-  t.every(50, sendLog);
+  timerLog = t.every(config[kLogSpeed].ival, sendLog);
+
+  // Get heading values every Xms
+  timerHeadingSample = t.every(50, getHeadingSample);
 
   // Get range values every Xms
-  t.every(50, getSamples);
+  timerRangeSample = t.every(100, getRangeSample);
+
+  // Get pressure values every Xms
+  timerPressureSample = t.every(2000, getPressureSample);
 
   // Start the loop timer
   loop_time = micros();
@@ -76,11 +119,11 @@ void setup() {
   //t.every(5000, steer);
   //t.every(5000, drive);
   //t.every(200, blink2);
-  cmdMessenger.sendCmdStart (kDrive);
-  cmdMessenger.sendCmdArg (DRIVE_DIRECTION_FORWARD);
-  cmdMessenger.sendCmdArg (1);
-  cmdMessenger.sendCmdArg (1.01);
-  cmdMessenger.sendCmdEnd ();
+  //cmdMessenger.sendCmdStart (kDrive);
+  //cmdMessenger.sendCmdArg (DRIVE_DIRECTION_FORWARD);
+  //cmdMessenger.sendCmdArg (1);
+  //cmdMessenger.sendCmdArg (1.01);
+  //cmdMessenger.sendCmdEnd ();
   //t.every(200, turn);
   //Controller.Drive(DRIVE_MOTOR_BOTH, DRIVE_DIRECTION_FORWARD, 0.6);
 }
@@ -111,6 +154,7 @@ void attachCommandCallbacks()
   cmdMessenger.attach(kDrive, OnDrive);
   cmdMessenger.attach(kCalibrate, OnCalibrate);
   cmdMessenger.attach(kTurn, OnTurn);
+  cmdMessenger.attach(kSetConfig, OnSetConfig);
 }
 
 // Called when a received command has no attached function
@@ -134,7 +178,7 @@ void OnDrive()
   // Read arguments
   unsigned char motor = cmdMessenger.readInt16Arg();
   unsigned char direction = cmdMessenger.readInt16Arg();
-  double speed = cmdMessenger.readDoubleArg ();
+  float speed = cmdMessenger.readFloatArg ();
 
   String output = "Drive command received: ";
   output.concat(motor);
@@ -143,6 +187,7 @@ void OnDrive()
   output.concat(":");
   output.concat(speed);
   cmdMessenger.sendCmd(kStatus, output);
+  
   Controller.Drive(motor, direction, speed);
 }
 
@@ -171,12 +216,70 @@ void OnTurn()
   Controller.Turn(direction, speed, amount);
 }
 
+void OnSetConfig() {
+  unsigned char key = cmdMessenger.readInt16Arg();
+  if(key == kLogSpeed) {
+    int value = cmdMessenger.readInt16Arg();
+    t.stop(timerLog);
+    timerLog = t.every(value, sendLog);
+    cmdMessenger.sendCmd(kStatus, "Arduino Feedback: Set Log Speed to " + String(value) + "ms");
+  } else if(key == kHeadingSampleRate) {
+    int value = cmdMessenger.readInt16Arg();
+    t.stop(timerHeadingSample);
+    timerHeadingSample = t.every(value, getHeadingSample);
+    cmdMessenger.sendCmd(kStatus, "Arduino Feedback: Set Heading Sample Speed to " + String(value) + "ms");
+  } else if(key == kFrontMotorRamp) {
+    int value = cmdMessenger.readInt16Arg();
+    Controller.__motorRamp[MOTOR_FRONT] = value;
+    cmdMessenger.sendCmd(kStatus, "Arduino Feedback: Set Front Motor Ramp to " + String(value) + "ms");
+  } else if(key == kRearMotorRamp) {
+    int value = cmdMessenger.readInt16Arg();
+    Controller.__motorRamp[MOTOR_REAR] = value;
+    cmdMessenger.sendCmd(kStatus, "Arduino Feedback: Set Rear Motor Ramp to " + String(value) + 'ms');
+  } else if(key == kTickDistance) {
+    int value = cmdMessenger.readInt16Arg();
+    Controller.__tickDistance = value/10.0;
+    cmdMessenger.sendCmd(kStatus, "Arduino Feedback: Set Distance per Tick to " + String(value/10.0) + 'cm');
+  } else if(key == kSpeedOfSound) {
+    long value = cmdMessenger.readInt32Arg();
+    Controller.__speedOfSound = value;
+    Controller.calcRangeTimeout();
+    cmdMessenger.sendCmd(kStatus, "Arduino Feedback: Set Speed of Sound to " + String(value) + 'cm/s');
+  } else if(key == kRangeMin) {
+    int value = cmdMessenger.readInt16Arg();
+    Controller.__rangeMin = value;
+    cmdMessenger.sendCmd(kStatus, "Arduino Feedback: Set Minimum Detecting Range to " + String(value) + 'cm');
+  } else if(key == kRangeMax) {
+    int value = cmdMessenger.readInt16Arg();
+    Controller.__rangeMax = value;
+    Controller.calcRangeTimeout();
+    cmdMessenger.sendCmd(kStatus, "Arduino Feedback: Set Maximum Detecting Range to " + String(value) + 'cm');
+  } else if(key == kRangeSampleRate) {
+    int value = cmdMessenger.readInt16Arg();
+    t.stop(timerRangeSample);
+    timerRangeSample = t.every(value, getRangeSample);
+    cmdMessenger.sendCmd(kStatus, "Arduino Feedback: Set Range Sample Speed to " + String(value) + "ms");
+  } else if(key == kPressureSampleRate) {
+    int value = cmdMessenger.readInt16Arg();
+    t.stop(timerPressureSample);
+    timerPressureSample = t.every(value, getPressureSample);
+    cmdMessenger.sendCmd(kStatus, "Arduino Feedback: Set Pressure Sample Speed to " + String(value) + "ms");
+  } else if(key == kDegreeCorrection) {
+    int value = cmdMessenger.readInt16Arg();
+    Controller.__degreeCorrection = value;
+    cmdMessenger.sendCmd(kStatus, "Arduino Feedback: Heading corrected by " + String(value) + " degrees");
+  } else {
+    cmdMessenger.sendCmd(kStatus, "Arduino Feedback: Unknow Config Setting Received!");
+  }
+}
+
 void sendLog() 
 {  
   // Capture program frequency)
   unsigned long capture_time = micros();
-  float capture_distance = HallSensor.distanceTraveled();
+  float capture_distance = Controller.distanceTraveled();
   int freq = round(loop_count/((capture_time-loop_time)/1000000.0));
+  Controller.readAccelGyro();
   
 
   String output = String(round(capture_time/1000.0));
@@ -185,13 +288,13 @@ void sendLog()
   output.concat(":");
   output.concat(Controller._potValue);
   output.concat(":");
-  output.concat(HallSensor.ticks);
+  output.concat(Controller._ticks);
   output.concat(":"); 
-  output.concat(Controller._speedGoalFront);
+  output.concat(Controller.__motorGoalSpeed[MOTOR_FRONT]/255.0);
   output.concat(":"); 
   output.concat(Controller._frontCurrent);
   output.concat(":");  
-  output.concat(Controller._speedGoalRear);
+  output.concat(Controller.__motorGoalSpeed[MOTOR_REAR]/255.0);
   output.concat(":");
   output.concat(Controller._rearCurrent);
   output.concat(":");
@@ -199,17 +302,15 @@ void sendLog()
   output.concat(":");
   output.concat(capture_distance);  
   output.concat(":");
-  //output.concat(turn amount);     
   output.concat(":");
-  //output.concat(turn goal); 
   output.concat(":"); 
   output.concat(Controller._frontFault);
   output.concat(":");   
   output.concat(Controller._rearFault);
   output.concat(":"); 
-  output.concat(Controller._RF_A);
+  output.concat(digitalRead(PIN_RF_A));
   output.concat(":");   
-  output.concat(Controller._RF_B);  
+  output.concat(digitalRead(PIN_RF_B));  
   output.concat(":");   
   output.concat(Controller._POT_LEFT_MAX);   
   output.concat(":");   
@@ -222,15 +323,51 @@ void sendLog()
   output.concat(Controller._rangeDuration); 
   output.concat(":");   
   output.concat(Controller._heading); 
-           
-  //output.concat(Controller._POT_RIGHT_MAX);
-  //output.concat(":"); 
-  //output.concat(Controller._potCenter);
-  //output.concat(":"); 
-  //output.concat(Controller._turnAmountPot);
+  output.concat(":");   
+  output.concat(Controller.__motorCurrentSpeed[MOTOR_FRONT]/255.0);  
+  output.concat(":");   
+  output.concat(Controller.__motorCurrentSpeed[MOTOR_REAR]/255.0);
   output.concat(":"); 
- //output.concat(HallSensor.distanceTraveled());
-  //output.concat(":");
+  output.concat(digitalRead(PIN_RF_C));
+  output.concat(":");   
+  output.concat(digitalRead(PIN_RF_D));  
+  output.concat(":");   
+  output.concat(Controller._headingX); 
+  output.concat(":");   
+  output.concat(Controller._headingY); 
+  output.concat(":");   
+  output.concat(Controller._headingZ);  
+  output.concat(":");   
+  output.concat(Controller.__rangeTimeout); 
+  output.concat(":");   
+  output.concat(Controller._ax); 
+  output.concat(":");   
+  output.concat(Controller._ay); 
+  output.concat(":");   
+  output.concat(Controller._az);
+  output.concat(":");   
+  output.concat(Controller._gx); 
+  output.concat(":");   
+  output.concat(Controller._gy); 
+  output.concat(":");   
+  output.concat(Controller._gz);  
+
+  output.concat(":");   
+  output.concat(Controller._altitudeDiff); 
+  output.concat(":");   
+  output.concat(Controller._baselinePressure); 
+  output.concat(":");   
+  output.concat(Controller._temperature); 
+  output.concat(":");   
+  output.concat(Controller._temperatureF); 
+  output.concat(":");   
+  output.concat(Controller._pressure); 
+  output.concat(":");   
+  output.concat(Controller._pressureHG); 
+  output.concat(":");   
+  output.concat(Controller._pressure0); 
+  output.concat(":");   
+  output.concat(Controller._pressure0HG);                         
 
   cmdMessenger.sendCmd(kLog, output);
 
@@ -239,28 +376,18 @@ void sendLog()
   distance_traveled = capture_distance;
 }
 
-void getSamples() {
-  Controller.getRange();
+void getHeadingSample() {
   Controller.getHeading();
 }
 
-/*
-void drive() {
+void getRangeSample() {
+  Controller.getRange();
+}
 
-  if(j == 0) {
-    Controller.Drive(DRIVE_MOTOR_FRONT, DRIVE_DIRECTION_BRAKE_HIGH, 1);
-    Controller.Drive(DRIVE_MOTOR_REAR, DRIVE_DIRECTION_BRAKE_LOW, 1);
+void getPressureSample() {
+  Controller.getPressure();
+}
 
-  } else if(j == 1) {
-    Controller.Drive(DRIVE_MOTOR_FRONT, DRIVE_DIRECTION_FORWARD, 1);   
-    Controller.Drive(DRIVE_MOTOR_REAR, DRIVE_DIRECTION_FORWARD, 1);    
-  } else {
-    Controller.Drive(DRIVE_MOTOR_FRONT, DRIVE_DIRECTION_BRAKE_LOW, 1);
-    Controller.Drive(DRIVE_MOTOR_REAR, DRIVE_DIRECTION_BRAKE_LOW, 1);    
-  }
-
-  j++;
-}*/
 
 /*
 void steer() {
@@ -272,25 +399,7 @@ void steer() {
     //Controller.turn(turn, 1, 1); // Direction, amount, speed 
   }
 }*/
-/*
-void blink2() {
 
-  char value;
-
-  if(sr_state == LOW) {
-    sr_state = HIGH;
-    //value = B01010101;
-  } else {
-    sr_state = LOW;
-    //value = B10101010;
-  }
-  //Serial.println("writing...");
-  //digitalWrite(PIN_SR_RCLK, LOW);
-  //shiftOut(PIN_SR_SER, PIN_SR_SRCLK, MSBFIRST, value);
-  digitalWrite(kBlinkLed, sr_state);
-  //Controller.setRegisterPin(0, sr_state);
-}
-*/
 /*
 void turn() {
    //Serial.println(analogRead(PIN_STEER_POT));

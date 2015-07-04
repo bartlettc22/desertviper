@@ -1,0 +1,117 @@
+.row(style="height:100%")
+  .col-md-5(style="height:100%")
+    .console-ctrl-container.dashblock(style="height:100%")
+      .h3 Drive Configuration
+      br
+      .h5 Drive Motors
+      .btn-group(data-toggle='buttons')
+        label.btn.btn-primary
+          input#MOTOR_FRONT(type='radio', name='motorSelect', autocomplete='off', ng-model="settings.motorSelect", value="0")
+          |  Front
+        label.btn.btn-primary
+          input#MOTOR_REAR(type='radio', name='motorSelect', autocomplete='off', ng-model="settings.motorSelect", value="1")
+          |  Rear
+        label.btn.btn-primary.active
+          input#MOTOR_BOTH(type='radio', name='motorSelect', autocomplete='off', ng-model="settings.motorSelect", value="2", checked='checked')
+          |  Both
+      br
+      .col-md-6
+        .h4 Front Motor    
+        div.container-fluid
+          .h5 Max Speed
+          div(style="font-size:0.9em; color:#999; padding-bottom:5px") Maximum speed, in percentage
+          div.row
+            div.col-md-8
+              input#motor-front-speed-slider(type='text', data-slider-min='-1', data-slider-max='101', data-slider-step='1', data-slider-value='100', data-slider-tooltip="hide", ng-model="settings.frontMotorGoal")
+              //-, ng-model="config.frontMotorGoal"
+            div.col-md-4
+              | {{settings.frontMotorGoal}}% 
+          .h5 Acceleration
+          div(style="font-size:0.9em; color:#999; padding-bottom:5px") Time to ramp up to full speed
+          .row
+            div.col-md-8
+              input#motor-front-acc-slider(type='text', data-slider-min='-100', data-slider-max='10100', data-slider-step='100', data-slider-value='3000', data-slider-tooltip="hide", ng-model="config.frontMotorRamp")
+            div.col-md-4
+              | {{config.frontMotorRamp}}ms
+             
+      .col-md-6
+        .h4 Rear Motor
+        .container-fluid
+          .row
+            .col-md-12
+              .h5 Max Speed
+              div(style="font-size:0.9em; color:#999; padding-bottom:5px") Maximum speed, in percentage
+          .row
+            .col-md-8
+              input#motor-rear-speed-slider(type='text', data-slider-min='-1', data-slider-max='101', data-slider-step='1', data-slider-value='100', data-slider-tooltip="hide", ng-model="settings.rearMotorGoal")
+              //-, ng-model="config.rearMotorGoal"
+            .col-md-4
+              | {{settings.rearMotorGoal}}%              
+
+          .row
+            .col-md-12
+              .h5 Acceleration
+              div(style="font-size:0.9em; color:#999; padding-bottom:5px") Time to ramp up to full speed
+          .row
+            .col-md-8
+              input#motor-rear-acc-slider(type='text', data-slider-min='-100', data-slider-max='10100', data-slider-step='100', data-slider-value='3000', data-slider-tooltip="hide", ng-model="config.rearMotorRamp")
+            .col-md-4
+              | {{config.rearMotorRamp}}ms    
+                   
+  .col-md-4
+    .container-fluid#control-keys
+      .row
+        .col-md-4
+        .col-md-4(style="padding:20px")
+          button.btn.btn-default.btn-lg#control-key-up
+            i.fa.fa-arrow-up.fa-5x
+        .col-md-4
+      .row
+        .col-md-4(style="padding:20px")
+          button.btn.btn-default.btn-lg#control-key-left
+            i.fa.fa-arrow-left.fa-5x
+        .col-md-4(style="padding:20px")
+          button.btn.btn-default.btn-lg#control-key-down
+            i.fa.fa-arrow-down.fa-5x               
+        .col-md-4(style="padding:20px")
+          button.btn.btn-default.btn-lg#control-key-right
+            i.fa.fa-arrow-right.fa-5x
+  .col-md-3
+    div
+      span.console-stat-name
+        | Pot Left Max
+      br
+      span.console-stat-value.stat#console-steering-pot-left-max
+    div
+      span.console-stat-name
+        | Pot Right Max
+      br
+      span.console-stat-value.stat#console-steering-pot-right-max
+    div
+      span.console-stat-name
+        | Pot Center
+      br
+      span.console-stat-value.stat#console-steering-pot-center                   
+    div
+      button.btn.btn-default.btn-sm#commandCalibrate Calibrate 
+
+    div
+      span.console-stat-name
+        | Front Motor Speed (%)
+      br
+      span.console-stat-value.stat#console-front-current-speed 
+    div
+      span.console-stat-name
+        | Front Motor Goal (%)
+      br
+      span.console-stat-value.stat#console-front-goal-speed     
+    div
+      span.console-stat-name
+        | Rear Motor Speed (%)
+      br
+      span.console-stat-value.stat#console-rear-current-speed 
+    div
+      span.console-stat-name
+        | Rear Motor Goal (%)
+      br
+      span.console-stat-value.stat#console-rear-goal-speed      

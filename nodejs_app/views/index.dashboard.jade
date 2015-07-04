@@ -1,0 +1,68 @@
+.row(style="height:100%")
+  .col-md-4(style="height:100%")
+    .dashblock(style="height:100%")
+      div
+        .h3 RF Remote Signal
+        span.fa-stack.fa-2x
+          i#dashboard-rf-a.fa.fa-circle.fa-stack-2x.rf-off
+          i.fa.fa-circle-thin.fa-stack-2x.rf-border
+          strong.fa-stack-1x.calendar-text.fa-inverse A
+        span.fa-stack.fa-2x
+          i#dashboard-rf-b.fa.fa-circle.fa-stack-2x.rf-off
+          i.fa.fa-circle-thin.fa-stack-2x.rf-border
+          strong.fa-stack-1x.calendar-text.fa-inverse B
+        span.fa-stack.fa-2x
+          i#dashboard-rf-c.fa.fa-circle.fa-stack-2x.rf-off
+          i.fa.fa-circle-thin.fa-stack-2x.rf-border
+          strong.fa-stack-1x.calendar-text.fa-inverse C
+        span.fa-stack.fa-2x
+          i#dashboard-rf-d.fa.fa-circle.fa-stack-2x.rf-off
+          i.fa.fa-circle-thin.fa-stack-2x.rf-border
+          strong.fa-stack-1x.calendar-text.fa-inverse D    
+      br
+      br
+      .h3 Compass Heading        
+      canvas#compassCanvas(width=500, height=500)
+
+  .col-md-8(style="height:100%")
+    .dashblock(style="height:100%")
+      .row(style="height:33%")
+        .col-md-2
+          .h4 Wheel Speed
+          .row(style="font-size:2em; color:#1BCDD1")
+            .col-md-7(style="text-align:right; padding:4px") 
+              #dashboard-speed
+            .col-md-5(style="text-align:left; padding:4px")
+              | cm/s
+        .col-md-10
+           #chartSpeedContainer(style="height: 280px; width:100%;")      
+      .row(style="height:33%")
+        .col-md-2
+          .h4 Program Frequency
+          .row(style="font-size:2em; color:#1BCDD1")
+            .col-md-6(style="text-align:right; padding:4px") 
+              #dashboard-frequency
+            .col-md-6(style="text-align:left; padding:4px")
+              | Hz
+        .col-md-10
+          #chartFrequencyContainer(style="height: 280px; width:100%;")
+      .row(style="height:33%")
+        .col-md-2
+          .h4 Front Motor Current
+          .row(style="font-size:2em; color:#1BCDD1")
+            .col-md-6(style="text-align:right; padding:4px") 
+              #dashboard-current-front
+            .col-md-6(style="text-align:left; padding:4px")
+              | mA
+          br
+          br
+          .h4 Rear Motor Current
+          .row(style="font-size:2em; color:#EC5657")
+            .col-md-6(style="text-align:right; padding:4px") 
+              #dashboard-current-rear
+            .col-md-6(style="text-align:left; padding:4px")
+              | mA  
+        .col-md-10
+          #chartCurrentContainer(style="height: 280px; width:100%;")
+      div#gaugeChart.epoch.gauge-medium
+      div#dashboard-speed-value

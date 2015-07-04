@@ -1,82 +1,113 @@
 'use strict';
 
-//var app = ;
+// Angular app setup and config controller
+var myApp = angular.module('myApp',[]);
+myApp.controller('configController', ['$scope', function ($scope, $window) {
+      $scope.default_config = {
+        logSpeed: 50, // ms
+        headingSampleRate: 50, // ms
+        frontMotorRamp: 3000, // ms
+        rearMotorRamp: 3000, // ms
+        tickDistance: 90, // mm
+        speedOfSound: 33350, // cm/s
+        rangeMin: 2, // cm
+        rangeMax: 400, // cm
+        rangeSampleRate: 100, // ms
+        pressureSampleRate: 2000, // ms
+        degreeCorrection: 90 // degrees
+      };
 
-angular.module('myApp', ['ngResource'])
+      $scope.config = angular.copy($scope.default_config);
+      $scope.settings = {
+        motorSelect:0,
+        frontMotorGoal:100,
+        rearMotorGoal:100
+      };
 
-  .factory('householdChores', ['$resource', function($resource){
-    return $resource('/householdChores/:id', null, {
-      'update': { method:'PUT' }
-    });
-  }])
-	.controller('MyController', ['$scope', 'householdChores', function ($scope, householdChores) {
-    
-    $scope.chores = householdChores.query();
+      $scope.$watch("config", function(newValue, oldValue) {
+        var keys = [];
+        var i = -1;
+        var changes = _.omit(newValue, function(v,k) { 
+          i++;
+          if(oldValue[k] === v) {
+            return true;
+          } else {
+            keys.push(i);
+            return false;
+          }
+        });
 
-    $scope.save = function(){
-    	console.log($scope.newChore);
-      if(!$scope.newChore || $scope.newChore.length < 1) return;
+        $.each(changes, function(key, value) {
 
-      var chore = new householdChores($scope.newChore);
-      chore.$save(function(){
-        $scope.chores.push(chore); // Push to db
-        $scope.newChore = ''; // Reset form
-        $('#myModal').modal('hide');
-      });
-		}
+          var enum_key = keys.shift();
+          console.log(key, enum_key, value);
+         
+          setConfig(enum_key, value); 
+        });
+        
+      }, true);
 
-		$scope.remove = function(index){
-      var chore = $scope.chores[index];
-      householdChores.remove({id: chore._id}, function(){
-        $scope.chores.splice(index, 1);
-      });        
-  	}
+  }]);
 
-  	$scope.toggle_actions = function() {
-      $(this).children('.collapse').collapse('toggle');
-    };
-	}]);
+var chartDataLength = 200;
 
-/*
-var app = angular.module('homeApp', ['ng-sortable'])
-    .controller('demo', ['$scope', function ($scope) {
-        $scope.items = ['learn Sortable',
-                      'use gn-sortable',
-                     'Enjoy'];
-    }]);
-*/
-var myChart;
-var timestamp = ((new Date()).getTime() / 1000)|0;
-var updateChart;
-var count
+angular.element(document).ready(function() {
 
-
-$(function() {
+  var configScope = angular.element(document.querySelector('[ng-controller="configController"]')).scope();
 
   // Default location (specified by hash)
   if(location.hash == '#dashboard') {
     toggleDashboard();
   } else if(location.hash == '#remote') {
     toggleRemote();
+  } else if(location.hash == '#sensors') {
+    toggleSensors();
   } else {
     toggleConsole();
   }
 
-  $("#toggle-serial").bootstrapSwitch();
-  $("#motor-speed-slider").slider({
+  //$("#toggle-serial").bootstrapSwitch();
+
+  $("#motor-front-speed-slider").slider();
+  $("#motor-front-acc-slider").slider();
+  $("#motor-rear-speed-slider").slider();
+  $("#motor-rear-acc-slider").slider();
+  /*
+  $("#motor-front-speed-slider").slider({
     value: 100,
     max:100,
     min:0,
-    create: function( event, ui ) { $('#motor-speed-value').val(100); },
-    change: function( event, ui ) { $('#motor-speed-value').val(ui.value); }
+    create: function( event, ui ) { $('#motor-front-speed-value').val(100); },
+    change: function( event, ui ) { $('#motor-front-speed-value').val(ui.value); },
+    slide: function( event, ui ) { $('#motor-front-speed-value').val(ui.value); }
   });
+  $("#motor-rear-speed-slider").slider({
+    value: 100,
+    max:100,
+    min:0,
+    create: function( event, ui ) { $('#motor-rear-speed-value').val(100); },
+    change: function( event, ui ) { configScope.$apply(function () { configScope.config.rearMotorGoal = ui.value; }); },
+    slide: function( event, ui ) { $('#motor-rear-speed-value').val(ui.value); }
+  });
+  $("#motor-front-acc-slider").slider({
+    value: 2000,
+    max:10000,
+    min:0,
+    step:100,
+    create: function( event, ui ) { $('#motor-front-acc-value').val(2000); },
+    change: function( event, ui ) { $('#motor-front-acc-value').val(ui.value); },
+    slide: function( event, ui ) { $('#motor-front-acc-value').val(ui.value); }
+  });
+  $("#motor-rear-acc-slider").slider({
+    value: 2000,
+    max:10000,
+    min:0,
+    step:100,
+    create: function( event, ui ) { $('#motor-rear-acc-value').val(2000); },
+    change: function( event, ui ) { $('#motor-rear-acc-value').val(ui.value); },
+    slide: function( event, ui ) { $('#motor-rear-acc-value').val(ui.value); }
+  });  */
 
-  // Scrolling Divs
-  $('.scrollable').enscroll({
-    showOnHover: true,
-    verticalTrackClass: 'track3',
-    verticalHandleClass: 'handle3'
-  });
 
   // Play/Pause
   $('#socketio-control').click(function() {
@@ -91,65 +122,102 @@ $(function() {
   });
 
   // Charts
-  myChart = $('#gaugeChart').epoch({
+  /*myChart = $('#gaugeChart').epoch({
     type: 'time.gauge',
     value: 500,
     domain: [0, 1000],
-    format: function(v) { return (v).toFixed(2) + ' cm/s'; }
-  });
-  
- /*var dps = []; // dataPoints
+    format: function(v) { return v.toFixed(2) + ' cm/s'; }
+  });*/
 
-    var chart = new CanvasJS.Chart("lineChart",{
-      title :{
-        text: "Live Random Data"
-      },      
-      data: [{
-        type: "line",
-        dataPoints: dps 
-      }]
-    });
-
-    var xVal = 0;
-    var yVal = 100; 
-    var updateInterval = 20;
-    var dataLength = 500; // number of dataPoints visible at any point
-
-updateChart = function (count, value) {
-  count = count || 1;
-  // count is number of times loop runs to generate random dataPoints.
-  
-  for (var j = 0; j < count; j++) { 
-    yVal = value;
-    dps.push({
-      x: xVal,
-      y: yVal
-    });
-    xVal++;
-  };
-  if (dps.length > dataLength)
-  {
-    dps.shift();        
+  // Compass Image
+  compassCanvas = document.getElementById("compassCanvas");
+  compassContext = compassCanvas.getContext("2d");
+  compassImage = document.createElement("img");
+  needleImage = document.createElement("img");
+  compassImage.onload=function() {
+      compassContext.drawImage(compassImage,compassCanvas.width/2-compassImage.width/2,compassCanvas.height/2-compassImage.width/2);
   }
+  needleImage.onload=function() {
+      compassContext.drawImage(needleImage,compassCanvas.width/2-needleImage.width/2,compassCanvas.height/2-needleImage.height/2);
+  }
+  compassImage.src="/images/compass2.png";
+  needleImage.src="/images/compass_needle.png";  
   
-  chart.render();   
+  chartCurrent.chart = new CanvasJS.Chart("chartCurrentContainer",{
+    data: [{
+      type: "line",
+      dataPoints: chartCurrent.dataFront
+    },{
+      type: "line",
+      dataPoints: chartCurrent.dataRear
+    }],
+    backgroundColor: "transparent",
+    axisX: {
+      lineThickness: 1,
+      tickThickness: 1
+    },
+    axisY: {
+      tickThickness:1,
+      lineThickness:1, 
+      gridThickness:1
+    }
+  });
+  chartFrequency.chart = new CanvasJS.Chart("chartFrequencyContainer",{
+    data: [{
+      type: "line",
+      dataPoints: chartFrequency.data
+    }],
+    backgroundColor: "transparent",
+    axisX: {
+      lineThickness: 1,
+      tickThickness: 1
+    },
+    axisY: {
+      tickThickness:1,
+      lineThickness:1, 
+      gridThickness:1
+    }
+  });  
+  chartSpeed.chart = new CanvasJS.Chart("chartSpeedContainer",{
+    data: [{
+      type: "line",
+      dataPoints: chartSpeed.data
+    }],
+    backgroundColor: "transparent",
+    axisX: {
+      lineThickness: 1,
+      tickThickness: 1
+    },
+    axisY: {
+      tickThickness:1,
+      lineThickness:1, 
+      gridThickness:1
+    }
+  }); 
 
-};
+  // Fill charts w/ zeros
+  
+  for(var c = 0; c < chartDataLength; c++) {
+    updateChart(chartSpeed, 0);
+    updateChart(chartFrequency, 0);
+    updateCurrentChart(chartCurrent, 0, 0);
+  }
+  chartSpeed.chart.render(); 
+  chartFrequency.chart.render();  
+  chartCurrent.chart.render();
 
-    // generates first set of dataPoints
-    updateChart(dataLength); */
-
-    // update chart after specified time. 
-    //setInterval(function(){updateChart()}, updateInterval); 
-
+  
+  $('.canvasjs-chart-credit').hide();
 });
 
 function toggleDashboard() {
   $('#nav-console-link').parent().removeClass('active');
   $('#nav-remote-link').parent().removeClass('active');
+  $('#nav-sensors-link').parent().removeClass('active');
   $('#nav-dashboard-link').parent().addClass('active');
   $('#console').hide();
   $('#remote').hide();
+  $('#sensors').hide();
   $('#dashboard').fadeIn('slow');
   location.hash = '#dashboard';
 }
@@ -157,20 +225,35 @@ function toggleDashboard() {
 function toggleRemote() {
   $('#nav-console-link').parent().removeClass('active');
   $('#nav-dashboard-link').parent().removeClass('active');
+  $('#nav-sensors-link').parent().removeClass('active');
   $('#nav-remote-link').parent().addClass('active');
   $('#console').hide();
   $('#dashboard').hide();
+  $('#sensors').hide();
   $('#remote').fadeIn('slow');
   location.hash = '#remote';
+}
+
+function toggleSensors() {
+  $('#nav-console-link').parent().removeClass('active');
+  $('#nav-dashboard-link').parent().removeClass('active');
+  $('#nav-remote-link').parent().removeClass('active');
+  $('#nav-sensors-link').parent().addClass('active');
+  $('#console').hide();
+  $('#dashboard').hide();
+  $('#remote').hide();
+  $('#sensors').fadeIn('slow');
+  location.hash = '#sensors';
 }
 
 function toggleConsole() {
   $('#nav-dashboard-link').parent().removeClass('active');
   $('#nav-remote-link').parent().removeClass('active');
+  $('#nav-sensors-link').parent().removeClass('active');
   $('#nav-console-link').parent().addClass('active');
   $('#dashboard').hide();
   $('#remote').hide();
+  $('#sensors').hide();
   $('#console').fadeIn('slow');
   location.hash = '#console';
 }
-

@@ -16,6 +16,8 @@ var serialport = require("serialport");
 var serialCommands = new Enum(['kSetLed', 'kStatus', 'kLog', 'kDrive', 'kCalibrate', 'kTurn']);
 var SerialPort = serialport.SerialPort;
 
+// Last time a message was received from Arduino - used to tell if connection was broken
+var lastSerialDataTime = new Date().getTime();
 // list serial ports:
 /*serialport.list(function (err, ports) {
   ports.forEach(function(port) {
@@ -39,13 +41,14 @@ var serialPort  = new SerialPort(serialPortName, {
 
 // Establish Serial connection and set up trigger to check periodically and reestablish if necessary
 checkSerialConnection();
-setInterval(checkSerialConnection, 5000);
+setInterval(checkSerialConnection, 1000);
 
 serialPort.on('open', function() {
   console.log('Serial Connection Established on Port "'+serialPortName+'" at '+serialPortBaud+' bps');
 });
 
 serialPort.on('data', function(data) {
+  lastSerialDataTime = new Date().getTime();
   io.emit('serialData', data);
 });
 
@@ -97,6 +100,7 @@ app.set('view engine', 'jade');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/bower_components',  express.static(__dirname + '/bower_components'));
 
 app.use('/', routes);
 
@@ -122,10 +126,15 @@ server.listen(8081, function() {
 });
 
 function checkSerialConnection() {
-  if(!serialPort.isOpen()) {
+
+  var hasTimedOut = ((new Date().getTime() - lastSerialDataTime) > 1000);
+
+  if(hasTimedOut) {
+  //if(!serialPort.isOpen()) {
     serialPort.open(function(error) {
       if ( error ) {
         console.log('Serial connection not found on "'+serialPortName+'", attempting to reconnect...');
+        console.log(error);
       }
     });
   }

@@ -1,0 +1,242 @@
+.row(style="text-align:left")
+  .col-md-3(style="padding-right:40px")
+    .row
+      .col-md-12.dashblock2(style="height:100%")
+        .h4 Hall Effect Sensor
+        .row
+          .col-md-4
+            span.console-stat-name Distance per Tick
+            br
+            span.console-stat-value
+              .form-inline
+                .form-group
+                  .input-group.input-group-xs
+                    input#config-tick-distance.form-control(type='text', placeholder='', value='50', ng-model="config.tickDistance", ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }")
+                    .input-group-addon mm/tick         
+          .col-md-8
+            span.console-stat-name
+              | Wheel Ticks
+            br
+            span.console-stat-value.stat#sensors-ticks                
+        .row(style="padding-top:20px")
+
+          .col-md-4
+            span.console-stat-name
+              | Calculated Speed
+            br
+            span.console-stat-value.stat#sensors-speed        
+          .col-md-7
+            span.console-stat-name
+              | Calculated Distance Traveled
+            br
+            span.console-stat-value.stat#sensors-distance
+    .row(style="padding-top:20px; text-align:left")        
+      .col-md-12.dashblock2(style="height:100%")
+        .h4 Sonic Range Sensor
+        .row
+          .col-md-4
+            span.console-stat-name Speed of Sound
+            br
+            span.console-stat-value
+              .form-inline
+                .form-group
+                  .input-group.input-group-xs
+                    input#config-range-speedofsound.form-control(type='text', placeholder='', value='50', ng-model="config.speedOfSound", ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }")
+                    .input-group-addon cm/s
+          .col-md-4
+            span.console-stat-name Min Distance
+            br
+            span.console-stat-value
+              .form-inline
+                .form-group
+                  .input-group.input-group-xs
+                    input#config-range-min-dist.form-control(type='text', placeholder='', value='50', ng-model="config.rangeMin", ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }")
+                    .input-group-addon cm
+          .col-md-4
+            span.console-stat-name Max Distance
+            br
+            span.console-stat-value
+              .form-inline
+                .form-group
+                  .input-group.input-group-xs
+                    input#config-range-max-dist.form-control(type='text', placeholder='', value='50', ng-model="config.rangeMax", ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }")
+                    .input-group-addon cm                                   
+        .row(style="padding-top:20px")
+          .col-md-4
+            span.console-stat-name Sample Rate
+            br
+            span.console-stat-value
+              .form-inline
+                .form-group
+                  .input-group.input-group-xs
+                    input#config-range-sample-rate.form-control(type='text', placeholder='', value='50', ng-model="config.rangeSampleRate", ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }")
+                    .input-group-addon ms      
+          .col-md-4
+            span.console-stat-name
+              | Range Duration
+            br
+            span.console-stat-value.stat#sensors-range-duration
+        .row(style="padding-top:20px")
+          .col-md-4
+            span.console-stat-name
+              | Calculated Timeout
+            br
+            span.console-stat-value.stat#sensors-range-timeout          
+          .col-md-5
+            span.console-stat-name
+              | Calculated Distance
+            br
+            span.console-stat-value.stat#sensors-range-distance      
+    .row(style="padding-top:20px; text-align:left") 
+      .col-md-12.dashblock2(style="height:100%")
+        .h4 RF Remote
+        .row
+          .col-md-3
+            div A
+            div 
+              span.console-stat-value.stat#console-rf-a
+          .col-md-3
+            div B
+            div 
+              span.console-stat-value.stat#console-rf-b
+          .col-md-3
+            div C
+            div 
+              span.console-stat-value.stat#console-rf-c
+          .col-md-3
+            div D
+            div 
+              span.console-stat-value.stat#console-rf-d               
+  .col-md-6(style="padding-right:40px")
+    .row
+      .col-md-12.dashblock2(style="height:100%") 
+        .h4 Magnetometer
+        .row
+          .col-md-2
+            div Sample Rate
+            .form-inline
+              .form-group
+                .input-group.input-group-xs
+                  input#config-mag-sample-rate.form-control(type='text', placeholder='', value='50', ng-model="config.headingSampleRate", ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }")
+                  .input-group-addon &deg; 
+          .col-md-2
+            div Degree Correction
+            .form-inline
+              .form-group
+                .input-group.input-group-xs
+                  input#config-mag-deg-correct.form-control(type='text', placeholder='', value='50', ng-model="config.degreeCorrection", ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }")
+                  .input-group-addon &deg;                   
+          .col-md-2
+            div Raw X-axis
+            div 
+              span.console-stat-value.stat#console-mag-x
+          .col-md-2
+            div Raw Y-axis
+            div 
+              span.console-stat-value.stat#console-mag-y
+          .col-md-2
+            div Raw Z-axis
+            div 
+              span.console-stat-value.stat#console-mag-z
+  
+        .row(style="padding-top:20px")
+          .col-md-3
+            div Calculated Heading
+            div 
+              span.console-stat-value.stat#sensors-heading  
+                       
+    .row(style="padding-top:20px; text-align:left")
+      .col-md-12.dashblock2(style="height:100%; padding-right:20px") 
+        .h4 Accelerometer
+        .col-md-3
+          div Raw X-axis
+          div 
+            span.console-stat-value.stat#sensors-acc-x
+        .col-md-3
+          div Raw Y-axis
+          div 
+            span.console-stat-value.stat#sensors-acc-y
+        .col-md-3
+          div Raw Z-axis
+          div 
+            span.console-stat-value.stat#sensors-acc-z                        
+    .row(style="padding-top:20px; text-align:left")
+      .col-md-12.dashblock2(style="height:100%; padding-right:20px") 
+        .h4 Gyroscope
+        .col-md-3
+          div Raw X-axis
+          div 
+            span.console-stat-value.stat#sensors-gyro-x
+        .col-md-3
+          div Raw Y-axis
+          div 
+            span.console-stat-value.stat#sensors-gyro-y
+        .col-md-3
+          div Raw Z-axis
+          div 
+            span.console-stat-value.stat#sensors-gyro-z
+    .row(style="padding-top:20px; text-align:left")
+      .col-md-12.dashblock2(style="height:100%; padding-right:20px") 
+        .h4 Pressure/Temperature
+        .row
+          .col-md-2
+            span.console-stat-name Sample Rate
+            br
+            span.console-stat-value
+              .form-inline
+                .form-group
+                  .input-group.input-group-xs
+                    input#config-pressure-sample-rate.form-control(type='text', placeholder='', value='50', ng-model="config.pressureSampleRate", ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }")
+                    .input-group-addon ms 
+          .col-md-1
+          .col-md-3
+            div Raw Pressure
+            div 
+              span.console-stat-value.stat#sensors-pressure
+              br
+              span.console-stat-value.stat#sensors-pressure-hg
+          .col-md-3
+            div Corrected Pressure
+            div 
+              span.console-stat-value.stat#sensors-pressure0
+              br
+              span.console-stat-value.stat#sensors-pressure0-hg          
+          .col-md-3
+            div Temperature
+            div 
+              span.console-stat-value.stat#sensors-temperature 
+              br
+              span.console-stat-value.stat#sensors-temperature-F 
+        .row(style="padding-top:20px")
+            .col-md-3
+              span.console-stat-name Baseline Pressure
+              br
+              span.console-stat-value.stat#sensors-pressure-baseline
+            .col-md-3
+              span.console-stat-name
+                | Altitude Change
+              br
+              span.console-stat-value.stat#sensors-altitude-change
+                                       
+
+  .col-md-3
+    .row
+      .col-md-12.dashblock2(style="height:100%; padding-right:20px")
+        .h4 Potentiometer (Turning)
+        .row
+          .col-md-4
+            span.console-stat-name
+              | Raw Value
+            br
+            span.console-stat-value.stat#console-steering-pot 
+        //
+          div
+            span.console-stat-name
+              | Front Current
+            br
+            span.console-stat-value.stat#console-front-motor-current   
+          div
+            span.console-stat-name
+              | Rear Current
+            br
+            span.console-stat-value.stat#console-rear-motor-current                     
