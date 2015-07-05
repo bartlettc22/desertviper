@@ -110,6 +110,7 @@ socket.on('serialData', function (data) {
 			$('#dashboard-frequency').html(logParts[1]);
       		updateChart(chartFrequency, Number(logParts[1]));
 			$('#console-steering-pot').html(logParts[2]);
+			$('#remote-steering-pot').html(logParts[2]);
 			$('#sensors-ticks').html(logParts[3]);
 			$('#sensors-speed').html(logParts[8] + ' cm/s');
 			$('#sensors-distance').html(logParts[9] + ' cm');
@@ -168,18 +169,22 @@ socket.on('serialData', function (data) {
 			$('#sensors-pressure-baseline').html(logParts[37] + ' mb');
 
 			$('#console-steering-pot-left-max').html(logParts[16]);
+			//configScope.$apply(function () { configScope.config.steeringLeftMax = logParts[16]; });
 			$('#console-steering-pot-right-max').html(logParts[17]);
+			//configScope.$apply(function () { configScope.config.steeringLeftMax = logParts[17]; });
 			$('#console-steering-pot-center').html(logParts[18]);
 			$('#footer-range').html(logParts[19] + ' cm');		
 			$('#sensors-range-duration').html(logParts[20] + ' &micro;s');
 			$('#sensors-range-distance').html(logParts[19] + ' cm');
 			$('#sensors-range-timeout').html(logParts[29] + ' &micro;s');
 
-			$('#console-front-current-speed').html(logParts[22]);
-			$('#console-front-goal-speed').html(logParts[4]);
-			$('#console-rear-current-speed').html(logParts[23]);
-			$('#console-rear-goal-speed').html(logParts[6]);
+			$('#remote-front-current-speed').html(Math.round(logParts[22]*100, 0) + '%');
+			//$('#remote-front-goal-speed').html(Math.round(logParts[4]*100, 0) + '%');
+			$('#remote-rear-current-speed').html(Math.round(logParts[23]*100, 0) + '%');
+			//$('#remote-rear-goal-speed').html(logParts[6]);
 
+			$('#remote-steering-left-goal').html(logParts[44]);
+			$('#remote-steering-right-goal').html(logParts[45]);
 
 			var card_dir = "";
 			if(logParts[21] <= 22.5 || logParts[21] >= 337.5) {
@@ -244,6 +249,21 @@ $(function() {
   }).mouseup(function() {
     drive(DRIVE_DIRECTION_BRAKE_LOW);
   });
+  $('#control-key-down').mousedown(function() {
+    drive(DRIVE_DIRECTION_REVERSE);
+  }).mouseup(function() {
+    drive(DRIVE_DIRECTION_BRAKE_LOW);
+  }); 
+  $('#control-key-left').mousedown(function() {
+    turn(TURN_DIRECTION_LEFT, 1);
+  }).mouseup(function() {
+    turn(TURN_DIRECTION_BRAKE, 1);
+  });  
+  $('#control-key-right').mousedown(function() {
+    turn(TURN_DIRECTION_RIGHT, 1);
+  }).mouseup(function() {
+    turn(TURN_DIRECTION_BRAKE, 1);
+  });    
 
   //$('#config-log-speed').blur(function() { setConfig('kLogSpeed', $(this).val()); });
   //$('#config-sample-speed').blur(function() { setConfig('kSampleSpeed', $(this).val()); });
@@ -258,7 +278,7 @@ $(function() {
             break;  
 
             case 37: // left
-		        	turn(TURN_DIRECTION_LEFT, 1, 1);
+		        	turn(TURN_DIRECTION_LEFT);
 		        	$("#control-key-left").addClass("active");
 		        break;
 
@@ -268,7 +288,7 @@ $(function() {
 		        break;
 
 		        case 39: // right
-		        	turn(TURN_DIRECTION_RIGHT, 1, 1);
+		        	turn(TURN_DIRECTION_RIGHT);
 		        	$("#control-key-right").addClass("active");
 		        break;
 
@@ -306,7 +326,7 @@ $(function() {
 	$(document).keyup(function(e) {
 	    switch(e.which) {
 	        case 37: // left
-	        	turn(TURN_DIRECTION_BRAKE, 1, 1);
+	        	turn(TURN_DIRECTION_BRAKE);
 	        	$("#control-key-left").removeClass("active");
 	        break;
 
@@ -317,7 +337,7 @@ $(function() {
 	        break;
 
 	        case 39: // right
-	        	turn(TURN_DIRECTION_BRAKE, 1, 1);
+	        	turn(TURN_DIRECTION_BRAKE);
 	        	$("#control-key-right").removeClass("active");
 	        break;
 
@@ -342,21 +362,31 @@ $(function() {
 });
 
 function drive(direction) {
-  var motor = eval($('input[name=motorSelect]:checked').attr('id'));
+  //var motor = eval($('input[name=motorSelect]:checked').attr('id'));
+  var motor = configScope.settings.motorSelect;
   if(motor == MOTOR_FRONT || motor == MOTOR_BOTH) {
-  	var speed = Number($('#motor-front-speed-slider').val())/100;
+  	//var speed = Number($('#motor-front-speed-slider').val())/100;
+  	var speed = configScope.settings.frontMotorGoal/100.0;
   	var command = serialCommands['kDrive'] + ',' + MOTOR_FRONT + ',' + direction + ',' + speed;
   	socket.emit('sendCommand', { command: command });  	
   }
   if(motor == MOTOR_REAR || motor == MOTOR_BOTH) {
-  	var speed = Number($('#motor-rear-speed-slider').val())/100;
+  	var speed = configScope.settings.rearMotorGoal/100.0;
   	var command = serialCommands['kDrive'] + ',' + MOTOR_REAR + ',' + direction + ',' + speed;
   	console.log(command);
   	socket.emit('sendCommand', { command: command }); 
   }
 }
 
-function turn(direction, speed, amount) {
+function turn(direction) {
+	var speed = configScope.settings.steeringMotorGoal/100.0;
+	if(direction == TURN_DIRECTION_RIGHT) {
+		var amount = configScope.settings.steeringAmountRight/100.0;
+	} else if (direction == TURN_DIRECTION_LEFT) {
+		var amount = configScope.settings.steeringAmountLeft/100.0;
+	} else {
+		var amount = 1;
+	}
 	var command = serialCommands['kTurn'] + ',' + direction + ',' + speed + ',' + amount;
 	socket.emit('sendCommand', { command: command });
 }

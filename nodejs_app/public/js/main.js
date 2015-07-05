@@ -1,8 +1,8 @@
 'use strict';
 
 // Angular app setup and config controller
-var myApp = angular.module('myApp',[]);
-myApp.controller('configController', ['$scope', function ($scope, $window) {
+var myApp = angular.module('myApp',['ui.bootstrap-slider', 'ui.bootstrap']);
+myApp.controller('configController', ['$scope', function ($scope) {
       $scope.default_config = {
         logSpeed: 50, // ms
         headingSampleRate: 50, // ms
@@ -14,14 +14,19 @@ myApp.controller('configController', ['$scope', function ($scope, $window) {
         rangeMax: 400, // cm
         rangeSampleRate: 100, // ms
         pressureSampleRate: 2000, // ms
-        degreeCorrection: 90 // degrees
+        degreeCorrection: 90, // degrees
+        steeringLeftMax: 900,
+        steeringRightMax: 100
       };
 
       $scope.config = angular.copy($scope.default_config);
       $scope.settings = {
-        motorSelect:0,
+        motorSelect:2,
         frontMotorGoal:100,
-        rearMotorGoal:100
+        rearMotorGoal:100,
+        steeringMotorGoal:100,
+        steeringAmountLeft: 100,
+        steeringAmountRight: 100
       };
 
       $scope.$watch("config", function(newValue, oldValue) {
@@ -46,14 +51,15 @@ myApp.controller('configController', ['$scope', function ($scope, $window) {
         });
         
       }, true);
-
   }]);
 
 var chartDataLength = 200;
+var configScope
 
 angular.element(document).ready(function() {
 
-  var configScope = angular.element(document.querySelector('[ng-controller="configController"]')).scope();
+  configScope = angular.element(document.querySelector('[ng-controller="configController"]')).scope();
+  
 
   // Default location (specified by hash)
   if(location.hash == '#dashboard') {
@@ -68,10 +74,10 @@ angular.element(document).ready(function() {
 
   //$("#toggle-serial").bootstrapSwitch();
 
-  $("#motor-front-speed-slider").slider();
-  $("#motor-front-acc-slider").slider();
-  $("#motor-rear-speed-slider").slider();
-  $("#motor-rear-acc-slider").slider();
+  //$("#motor-front-speed-slider").slider();
+  //$("#motor-front-acc-slider").slider();
+  //$("#motor-rear-speed-slider").slider();
+  //$("#motor-rear-acc-slider").slider();
   /*
   $("#motor-front-speed-slider").slider({
     value: 100,

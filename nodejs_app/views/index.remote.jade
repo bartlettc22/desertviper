@@ -4,61 +4,89 @@
       .h3 Drive Configuration
       br
       .h5 Drive Motors
-      .btn-group(data-toggle='buttons')
-        label.btn.btn-primary
-          input#MOTOR_FRONT(type='radio', name='motorSelect', autocomplete='off', ng-model="settings.motorSelect", value="0")
+      .btn-group
+        label.btn.btn-primary(ng-model="settings.motorSelect", btn-radio="0")
+          //-input#MOTOR_FRONT(type='radio', name='motorSelect', autocomplete='off', ng-model="settings.motorSelect", value="0", onchange="$(this).trigger('input');")
           |  Front
-        label.btn.btn-primary
-          input#MOTOR_REAR(type='radio', name='motorSelect', autocomplete='off', ng-model="settings.motorSelect", value="1")
+        label.btn.btn-primary(ng-model="settings.motorSelect", btn-radio="1")
+          //-input#MOTOR_REAR(type='radio', name='motorSelect', autocomplete='off', ng-model="settings.motorSelect", value="1", onchange="$(this).trigger('input');")
           |  Rear
-        label.btn.btn-primary.active
-          input#MOTOR_BOTH(type='radio', name='motorSelect', autocomplete='off', ng-model="settings.motorSelect", value="2", checked='checked')
+        label.btn.btn-primary(ng-model="settings.motorSelect", btn-radio="2")
+          //-input#MOTOR_BOTH(type='radio', name='motorSelect', autocomplete='off', ng-model="settings.motorSelect", value="2", checked='checked', onchange="$(this).trigger('input');")
           |  Both
-      br
-      .col-md-6
-        .h4 Front Motor    
-        div.container-fluid
-          .h5 Max Speed
-          div(style="font-size:0.9em; color:#999; padding-bottom:5px") Maximum speed, in percentage
-          div.row
-            div.col-md-8
-              input#motor-front-speed-slider(type='text', data-slider-min='-1', data-slider-max='101', data-slider-step='1', data-slider-value='100', data-slider-tooltip="hide", ng-model="settings.frontMotorGoal")
-              //-, ng-model="config.frontMotorGoal"
-            div.col-md-4
-              | {{settings.frontMotorGoal}}% 
-          .h5 Acceleration
-          div(style="font-size:0.9em; color:#999; padding-bottom:5px") Time to ramp up to full speed
-          .row
-            div.col-md-8
-              input#motor-front-acc-slider(type='text', data-slider-min='-100', data-slider-max='10100', data-slider-step='100', data-slider-value='3000', data-slider-tooltip="hide", ng-model="config.frontMotorRamp")
-            div.col-md-4
-              | {{config.frontMotorRamp}}ms
-             
-      .col-md-6
-        .h4 Rear Motor
-        .container-fluid
-          .row
-            .col-md-12
-              .h5 Max Speed
-              div(style="font-size:0.9em; color:#999; padding-bottom:5px") Maximum speed, in percentage
-          .row
-            .col-md-8
-              input#motor-rear-speed-slider(type='text', data-slider-min='-1', data-slider-max='101', data-slider-step='1', data-slider-value='100', data-slider-tooltip="hide", ng-model="settings.rearMotorGoal")
-              //-, ng-model="config.rearMotorGoal"
-            .col-md-4
-              | {{settings.rearMotorGoal}}%              
+      .row
+        .col-md-6
+          .h4 Front Motor    
+          div.container-fluid
+            .h5 Max Speed
+            div(style="font-size:0.9em; color:#999; padding-bottom:5px") Maximum speed, in percentage
+            div.row
+              div.col-md-8
+                //-input#motor-front-speed-slider(type='text', data-slider-min='0', data-slider-max='100', data-slider-step='1', data-slider-value='100', data-slider-tooltip="hide", ng-model="settings.frontMotorGoal", onChange="$(this).scope().$apply();$(this).trigger('input');")
+                //-input#test(ng-model="settings.frontMotorGoal")
+                slider#motor-front-speed-slider(ng-model="settings.frontMotorGoal" min="0" step="1" max="100" value="100" slider-tooltip="hide")
+                //-div(range-slider, min="0", step="1", max="100", pin-handle="min" ng-model="settings.frontMotorGoal")
+                //-div(ui-slider, min="0", step="1", max="100", ng-model="settings.frontMotorGoal")
+                //-div(slider, ng-model="settings.frontMotorGoal", floor="0", ceiling="100", step="1")
+                //-, precision="{integer}", stretch="{integer}", translate-fn="{expression}", scale-fn="{expression}", inverse-scale-fn="{expression}")
 
-          .row
-            .col-md-12
-              .h5 Acceleration
-              div(style="font-size:0.9em; color:#999; padding-bottom:5px") Time to ramp up to full speed
-          .row
-            .col-md-8
-              input#motor-rear-acc-slider(type='text', data-slider-min='-100', data-slider-max='10100', data-slider-step='100', data-slider-value='3000', data-slider-tooltip="hide", ng-model="config.rearMotorRamp")
-            .col-md-4
-              | {{config.rearMotorRamp}}ms    
-                   
-  .col-md-4
+                //-, ng-model="config.frontMotorGoal"
+              div.col-md-4
+                | {{settings.frontMotorGoal}}% 
+            .h5 Acceleration
+            div(style="font-size:0.9em; color:#999; padding-bottom:5px") Time to ramp up to full speed (0% to 100%)
+            .row
+              div.col-md-12
+                //-input#motor-front-acc-slider(type='text', data-slider-min='-100', data-slider-max='10100', data-slider-step='100', data-slider-value='3000', data-slider-tooltip="hide", ng-model="config.frontMotorRamp")
+                //-span(slider, slider-id="1" ng-model="config.frontMotorRamp" min="0" step="100" max="10000" slider-tooltip="hide")
+                //-slider#motor-front-acc-slider(ng-model="config.frontMotorRamp" min="0" step="10" max="1000" value="100" slider-tooltip="hide")
+                .form-inline
+                  .form-group
+                    .input-group.input-group
+                      input#motor-front-acc-slider.form-control(type='text', placeholder='', value='50', ng-model="config.frontMotorRamp", ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }")
+                      .input-group-addon ms               
+              
+        .col-md-6
+          .h4 Rear Motor
+          .container-fluid
+            .row
+              .col-md-12
+                .h5 Max Speed
+                div(style="font-size:0.9em; color:#999; padding-bottom:5px") Maximum speed, in percentage
+            .row
+              .col-md-8
+                //-input#motor-rear-speed-slider(type='text', data-slider-min='-1', data-slider-max='101', data-slider-step='1', data-slider-value='100', data-slider-tooltip="hide", ng-model="settings.rearMotorGoal")
+                slider#motor-rear-speed-slider(ng-model="settings.rearMotorGoal" min="0" step="1" max="100" value="100" slider-tooltip="hide")
+                //-, ng-model="config.rearMotorGoal"
+              .col-md-4
+                | {{settings.rearMotorGoal}}%              
+
+            .row
+              .col-md-12
+                .h5 Acceleration
+                div(style="font-size:0.9em; color:#999; padding-bottom:5px") Time to ramp up to full speed (0% to 100%)
+            .row
+              .col-md-12
+                //-input#motor-rear-acc-slider(type='text', data-slider-min='-100', data-slider-max='10100', data-slider-step='100', data-slider-value='3000', data-slider-tooltip="hide", ng-model="config.rearMotorRamp")
+                .form-inline
+                  .form-group
+                    .input-group.input-group
+                      input#motor-rear-acc-slider.form-control(type='text', placeholder='', value='50', ng-model="config.rearMotorRamp", ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }")
+                      .input-group-addon ms                
+              
+      .row(style="padding-top:20px")
+        .col-md-6
+          .h4 Front Motor Speed (Actual/Max)
+          span.console-stat-value.stat#remote-front-current-speed(style="font-size:2em")
+          span.console-stat-value.stat(style="font-size:2em") &nbsp;/&nbsp;
+          span.console-stat-value.stat#remote-front-goal-speed(style="font-size:2em") {{settings.frontMotorGoal}}%
+        .col-md-6
+          .h4 Rear Motor Speed (Actual/Max)
+          span.console-stat-value.stat#remote-rear-current-speed(style="font-size:2em")
+          span.console-stat-value.stat(style="font-size:2em") &nbsp;/&nbsp;
+          span.console-stat-value.stat#remote-rear-goal-speed(style="font-size:2em") {{settings.rearMotorGoal}}%          
+                  
+  .col-md-3
     .container-fluid#control-keys
       .row
         .col-md-4
@@ -76,42 +104,86 @@
         .col-md-4(style="padding:20px")
           button.btn.btn-default.btn-lg#control-key-right
             i.fa.fa-arrow-right.fa-5x
-  .col-md-3
-    div
-      span.console-stat-name
-        | Pot Left Max
-      br
-      span.console-stat-value.stat#console-steering-pot-left-max
-    div
-      span.console-stat-name
-        | Pot Right Max
-      br
-      span.console-stat-value.stat#console-steering-pot-right-max
-    div
-      span.console-stat-name
-        | Pot Center
-      br
-      span.console-stat-value.stat#console-steering-pot-center                   
-    div
-      button.btn.btn-default.btn-sm#commandCalibrate Calibrate 
+  .col-md-4
+    .console-ctrl-container.dashblock(style="height:100%")
+      .h3 Steering Configuration
+      div.row(style="padding-top:20px")
+        .col-md-8
+          .h5 Max Speed
+          div(style="font-size:0.9em; color:#999; padding-bottom:5px") Maximum speed, in percentage
+          div.col-md-8
+            slider(ng-model="settings.steeringMotorGoal" min="0" step="1" max="100" value="100" slider-tooltip="hide")      
+          div.col-md-4
+            | {{settings.steeringMotorGoal}}%
+      
 
-    div
-      span.console-stat-name
-        | Front Motor Speed (%)
-      br
-      span.console-stat-value.stat#console-front-current-speed 
-    div
-      span.console-stat-name
-        | Front Motor Goal (%)
-      br
-      span.console-stat-value.stat#console-front-goal-speed     
-    div
-      span.console-stat-name
-        | Rear Motor Speed (%)
-      br
-      span.console-stat-value.stat#console-rear-current-speed 
-    div
-      span.console-stat-name
-        | Rear Motor Goal (%)
-      br
-      span.console-stat-value.stat#console-rear-goal-speed      
+      div.row(style="padding-top:20px")
+        .col-md-8
+          .h5 Steering Amount Left
+          div(style="font-size:0.9em; color:#999; padding-bottom:5px") Percentage turn
+          div.col-md-8
+            slider(ng-model="settings.steeringAmountLeft" min="0" step="1" max="100" value="100" slider-tooltip="hide")      
+          div.col-md-4
+            | {{settings.steeringAmountLeft}}%
+
+      div.row(style="padding-top:20px")
+        .col-md-8
+          .h5 Steering Amount Right
+          div(style="font-size:0.9em; color:#999; padding-bottom:5px") Percentage turn
+          div.col-md-8
+            slider(ng-model="settings.steeringAmountRight" min="0" step="1" max="100" value="100" slider-tooltip="hide")      
+          div.col-md-4
+            | {{settings.steeringAmountRight}}%            
+
+        
+      //
+        div.row(style="padding-top:20px")
+          .col-md-8
+            .h5 Max Speed
+            div(style="font-size:0.9em; color:#999; padding-bottom:5px") Maximum speed, in percentage
+            div.col-md-8
+              slider(ng-model="settings.steeringLeftMax" min="0" step="1" max="1023", range="true", value="[250,450]", slider-tooltip="hide") 
+
+            div.col-md-4
+              | {{settings.steeringMotorGoal}}%                       
+      .row(style="padding-top:20px")
+        .col-md-3
+          span.console-stat-name
+            | Pot Left Max
+          br
+          span.console-stat-value.stat#console-steering-pot-left-max
+          input.form-control(type='text', placeholder='', value='50', ng-model="config.steeringLeftMax", ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }")
+        .col-md-3
+          span.console-stat-name
+            | Pot Right Max
+          br
+          span.console-stat-value.stat#console-steering-pot-right-max
+          input.form-control(type='text', placeholder='', value='50', ng-model="config.steeringRightMax", ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }")
+        .col-md-3
+
+          span.console-stat-name
+            | Pot Center
+          br
+          span.console-stat-value.stat#console-steering-pot-center                   
+        .col-md-3
+          button.btn.btn-default.btn-sm#commandCalibrate Calibrate 
+
+      .row(style="padding-top:20px")
+        .col-md-5
+            span.console-stat-name
+              | Current Potentiometer Reading
+            br
+            span.console-stat-value.stat#remote-steering-pot
+
+      .row(style="padding-top:20px")
+        .col-md-3
+          span.console-stat-name
+            | Turn Left Goal
+          br
+          span.console-stat-value.stat#remote-steering-left-goal
+        .col-md-3
+          span.console-stat-name
+            | Turn Right Goal
+          br
+          span.console-stat-value.stat#remote-steering-right-goal
+               

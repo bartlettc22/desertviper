@@ -80,8 +80,31 @@ void Ctrl::checkSteering() {
 
   _potValue = analogRead(PIN_STEER_POT);
   //Serial.println(_potValue);
+  
   // If we're within x of goal, stop motors to lock wheels in this position
-  //if (_potValue >= (_potGoal - 10) && _potValue <= (_potGoal + 10)) {
+  if (_turningDirection == MOTOR_DIRECTION_CW) { // Right
+    if(_potValue < (_turnRightGoal - __potMaintainTolerance)) { 
+
+      // We're past goal, apply brakes
+      Turn(MOTOR_DIRECTION_BRAKE_LOW,_turningSpeed);
+    } else if (_potValue > (_turnRightGoal + __potMaintainTolerance)) {
+      // We haven't made it yet, keep trying
+      Turn(MOTOR_DIRECTION_CW, _turningSpeed);
+    }
+  } else if (_turningDirection == MOTOR_DIRECTION_CCW) { // Left
+
+    if(_potValue > (_turnLeftGoal + __potMaintainTolerance)) { 
+      _turningStatus = "Turning Left beyond goal";
+      // We're past goal, apply brakes
+      Turn(MOTOR_DIRECTION_BRAKE_LOW, _turningSpeed);
+    } else if (_potValue < (_turnLeftGoal - __potMaintainTolerance)) {
+      // We haven't made it yet, keep trying
+      Turn(MOTOR_DIRECTION_CCW, _turningSpeed);
+    }
+  } else {
+    Turn(_turningDirection, _turningSpeed);
+  }
+    //_potValue >= (_potGoal - 10) && _potValue <= (_potGoal + 10)) {
     //setMBrake(400); // Full Brake to hold turn
     //setSteerBrake();
     //Serial.println("Stopping, within goal");
@@ -96,29 +119,32 @@ void Ctrl::checkSteering() {
 }
 
 
-void Ctrl::Turn(unsigned char direction, float speed, float amount) {
+void Ctrl::Turn(unsigned char direction, int speed) {
   
   // Default Brake
   int _INA = LOW;
   int _INB = LOW;
-  int _speed = round(speed * 255);
+  //int _speed = round(speed * 255);
+
+  
 
   // Amount of turn is based on potentiometer reading
 
-  if(direction == TURN_DIRECTION_LEFT) {
+  if(direction == MOTOR_DIRECTION_CCW) { // LEFT
+    //_turnLeftGoal = _potCenter + (amount*(_POT_LEFT_MAX - _potCenter));
     _INA = LOW;
     _INB = HIGH;
-  } else if(direction == TURN_DIRECTION_RIGHT) {
+  } else if(direction == MOTOR_DIRECTION_CW) { // RIGHT
+    //_turnRightGoal = _potCenter - (amount*(_potCenter - _POT_RIGHT_MAX));
+    // Right
     _INA = HIGH;
     _INB = LOW;    
-  } else if(direction == TURN_DIRECTION_BRAKE) {
+  } else if(direction == MOTOR_DIRECTION_BRAKE_LOW) {
     _INA = LOW;
     _INB = LOW;
-    // _INA = HIGH;
-    // _INB = HIGH;
   }
 
-  analogWrite(PIN_STEER_PWM, _speed);
+  analogWrite(PIN_STEER_PWM, speed);
   digitalWrite(PIN_STEER_INA1, _INA);
   digitalWrite(PIN_STEER_INB1, _INB);
 }
@@ -245,18 +271,18 @@ void Ctrl::checkDrive() {
 
 
 void Ctrl::CalibrateSteering() {
-  Turn(TURN_DIRECTION_LEFT, 1, 1);
+  Turn(MOTOR_DIRECTION_CCW, 1);
   delay(1000);
   _POT_LEFT_MAX = analogRead(PIN_STEER_POT);
-  Turn(TURN_DIRECTION_BRAKE, 1, 1);
+  Turn(MOTOR_DIRECTION_BRAKE_LOW, 1);
   delay(1000);
-  Turn(TURN_DIRECTION_RIGHT, 1, 1);
+  Turn(MOTOR_DIRECTION_CW, 1); // Right
   delay(1000);
   _POT_RIGHT_MAX = analogRead(PIN_STEER_POT);
-  Turn(TURN_DIRECTION_BRAKE, 1, 1);  
+  Turn(MOTOR_DIRECTION_BRAKE_LOW, 1);  
 
-  _potCenter = (_POT_LEFT_MAX + _POT_RIGHT_MAX) / 2;
-  _turnAmountPot = (_POT_LEFT_MAX - _potCenter); // Potentiometer value (to add to center) for 100% turn
+  //_potCenter = (_POT_LEFT_MAX + _POT_RIGHT_MAX) / 2;
+  //_turnAmountPot = (_POT_LEFT_MAX - _potCenter); // Potentiometer value (to add to center) for 100% turn
 
 }
 

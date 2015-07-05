@@ -11,21 +11,8 @@
 #include "CmdMessenger.h"
 #include "Kalman.h"
 #include "SFE_BMP180.h"
-
-// Custom Libraries
-// #include "Messaging.h"
-
-// #include "HallSensor.h"
 #include "Controller.h"
-//#include "Instruction.h"
-//#include "Program.h"
 
-//Msg Messenger = Msg();
-
-//int sr_state = LOW;
-//unsigned char turn = TURN_DIRECTION_LEFT;
-//bool ledState                   = 0;   // Current state of Led
-const int kBlinkLed             = 3;  // Pin of internal Led
 Timer t;
 CmdMessenger cmdMessenger = CmdMessenger(Serial);
 
@@ -54,7 +41,9 @@ enum
   kRangeMax,
   kRangeSampleRate,
   kPressureSampleRate,
-  kDegreeCorrection  
+  kDegreeCorrection,
+  kSteeringLeftMax,
+  kSteeringRightMax
 };
 
 struct {
@@ -62,9 +51,6 @@ struct {
     float fval;
     char cval;
 } config[2];
-
-// Implement varying config types using a "tagged union"
-
 
 // Temporary variables
 int j = 0;
@@ -77,8 +63,7 @@ int timerLog;
 int timerHeadingSample;
 int timerRangeSample;
 int timerPressureSample;
-//Prog Program = Prog();
-//Ctrl Controller = Ctrl();
+
 void setup() {
 
   // 
@@ -111,21 +96,7 @@ void setup() {
   // Start the loop timer
   loop_time = micros();
 
-  // set pin for blink LED
-  pinMode(kBlinkLed, OUTPUT);  
-  //Program.init();
   Controller.init();
-  //t.every(2000, getFreq);
-  //t.every(5000, steer);
-  //t.every(5000, drive);
-  //t.every(200, blink2);
-  //cmdMessenger.sendCmdStart (kDrive);
-  //cmdMessenger.sendCmdArg (DRIVE_DIRECTION_FORWARD);
-  //cmdMessenger.sendCmdArg (1);
-  //cmdMessenger.sendCmdArg (1.01);
-  //cmdMessenger.sendCmdEnd ();
-  //t.every(200, turn);
-  //Controller.Drive(DRIVE_MOTOR_BOTH, DRIVE_DIRECTION_FORWARD, 0.6);
 }
 
 void loop() {
@@ -162,15 +133,6 @@ void OnUnknownCommand()
 {
   cmdMessenger.sendCmd(kStatus,"Command without attached callback");
 }
-
-// Callback function that sets led on or off
-/*void OnSetLed()
-{
-  // Read led state argument, interpret string as boolean
-  bool ledState = cmdMessenger.readBoolArg();
-  // Set led
-  digitalWrite(kBlinkLed, ledState?HIGH:LOW);
-}*/
 
 // Callback function for remote drive command
 void OnDrive()
@@ -213,7 +175,16 @@ void OnTurn()
   output.concat(":");
   output.concat(amount);
   cmdMessenger.sendCmd(kStatus, output);
-  Controller.Turn(direction, speed, amount);
+  Controller._turningDirection = direction;
+  Controller._turningSpeed = round(speed * 255);
+
+  if(direction == MOTOR_DIRECTION_CCW) {
+    Controller._turnLeftGoal = Controller._potCenter + (amount*(Controller._POT_LEFT_MAX - Controller._potCenter));
+  } else if (direction == MOTOR_DIRECTION_CCW) {
+    Controller._turnRightGoal = Controller._potCenter - (amount*(Controller._potCenter - Controller._POT_RIGHT_MAX));
+  }
+  
+  //Controller.Turn(direction, speed, amount);
 }
 
 void OnSetConfig() {
@@ -268,6 +239,14 @@ void OnSetConfig() {
     int value = cmdMessenger.readInt16Arg();
     Controller.__degreeCorrection = value;
     cmdMessenger.sendCmd(kStatus, "Arduino Feedback: Heading corrected by " + String(value) + " degrees");
+  } else if(key == kSteeringLeftMax) {
+    int value = cmdMessenger.readInt16Arg();
+    Controller._POT_LEFT_MAX = value;
+    cmdMessenger.sendCmd(kStatus, "Arduino Feedback: Setting Potentiometer LEFT max to " + String(value));
+  } else if(key == kSteeringRightMax) {
+    int value = cmdMessenger.readInt16Arg();
+    Controller._POT_RIGHT_MAX = value;
+    cmdMessenger.sendCmd(kStatus, "Arduino Feedback: Setting Potentiometer RIGHT max to " + String(value));
   } else {
     cmdMessenger.sendCmd(kStatus, "Arduino Feedback: Unknow Config Setting Received!");
   }
@@ -367,7 +346,14 @@ void sendLog()
   output.concat(":");   
   output.concat(Controller._pressure0); 
   output.concat(":");   
-  output.concat(Controller._pressure0HG);                         
+  output.concat(Controller._pressure0HG);   
+  output.concat(":");   
+  output.concat(Controller._turnLeftGoal);  
+  output.concat(":");   
+  output.concat(Controller._turnRightGoal); 
+  output.concat(":");   
+  output.concat(Controller._turningStatus);        
+        
 
   cmdMessenger.sendCmd(kLog, output);
 
@@ -387,54 +373,3 @@ void getRangeSample() {
 void getPressureSample() {
   Controller.getPressure();
 }
-
-
-/*
-void steer() {
-  if(turn == TURN_DIRECTION_LEFT) {
-    turn = TURN_DIRECTION_RIGHT;
-    //Controller.turn(turn, 1, 1); // Direction, amount, speed 
-  } else {
-    turn = TURN_DIRECTION_LEFT;
-    //Controller.turn(turn, 1, 1); // Direction, amount, speed 
-  }
-}*/
-
-/*
-void turn() {
-   //Serial.println(analogRead(PIN_STEER_POT));
-   
-  if(j == 0) {
-    Controller.Turn(TURN_DIRECTION_LEFT, 1, 1);
-    //Controller.Drive(DRIVE_MOTOR_BOTH, DRIVE_DIRECTION_FORWARD, 1);
-    Controller.setRegisterPin(0, HIGH); 
-    Controller.setRegisterPin(4, LOW);  
-    //Serial.println("LEFT");
-    j++;
-  } else if(j == 1) {
-    Controller.Turn(TURN_DIRECTION_BRAKE, 1, 1);
-    //Controller.Drive(DRIVE_MOTOR_BOTH, DRIVE_DIRECTION_BRAKE_LOW, 1);
-    Controller.setRegisterPin(0, LOW);
-    Controller.setRegisterPin(4, HIGH);   
-    j++;
-  } else if(j == 2) {
-    Controller.Turn(TURN_DIRECTION_RIGHT, 1, 1);
-    //Controller.Drive(DRIVE_MOTOR_BOTH, DRIVE_DIRECTION_REVERSE, 1);
-    Controller.setRegisterPin(0, HIGH); 
-    Controller.setRegisterPin(4, LOW);  
-    //Serial.println("RIGHT");
-    j++;
-  } else {
-    Controller.Turn(TURN_DIRECTION_BRAKE, 1, 1);
-    //Controller.Drive(DRIVE_MOTOR_BOTH, DRIVE_DIRECTION_BRAKE_LOW, 1);
-    Controller.setRegisterPin(0, LOW);
-    Controller.setRegisterPin(4, HIGH);
-    j = 0;
-  }
-  //Serial.println("writing...");
-  //digitalWrite(PIN_SR_RCLK, LOW);
-  //shiftOut(PIN_SR_SER, PIN_SR_SRCLK, MSBFIRST, value);
-  //digitalWrite(PIN_SR_RCLK, HIGH);
-  //Controller.setRegisterPin(0, sr_state);
-}*/
-

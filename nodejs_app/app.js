@@ -129,8 +129,8 @@ function checkSerialConnection() {
 
   var hasTimedOut = ((new Date().getTime() - lastSerialDataTime) > 1000);
 
-  if(hasTimedOut) {
-  //if(!serialPort.isOpen()) {
+  //if(hasTimedOut) {
+  if(!serialPort.isOpen()) {
     serialPort.open(function(error) {
       if ( error ) {
         console.log('Serial connection not found on "'+serialPortName+'", attempting to reconnect...');

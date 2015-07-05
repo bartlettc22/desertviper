@@ -50,23 +50,6 @@
 #define PIN_RANGE_TRIG   46
 #define PIN_RANGE_ECHO   47
 
-// Steering Motor Globals
-#define TURN_DIRECTION_BRAKE    0
-#define TURN_DIRECTION_LEFT     1
-#define TURN_DIRECTION_RIGHT    2
-
-// Drive Motor Globals
-/*#define DRIVE_MOTOR_FRONT       0
-#define DRIVE_MOTOR_REAR        1
-#define DRIVE_MOTOR_BOTH        2
-
-#define DRIVE_DIRECTION_FORWARD     0
-#define DRIVE_DIRECTION_REVERSE     1
-#define DRIVE_DIRECTION_COAST       2
-#define DRIVE_DIRECTION_BRAKE_LOW   3
-#define DRIVE_DIRECTION_BRAKE_HIGH  4*/
-//#define DRIVE_DIRECTION_DISABLE     5 // Don't use this as it isn't implemented
-
 #define MOTOR_FRONT                 0
 #define MOTOR_REAR                  1
 #define MOTOR_BOTH                  2
@@ -112,7 +95,7 @@ class Ctrl
     * @param speed      Specify speed to drive (0 to 1, for example 0.5 drives at half speed)
     * @param amount     Specify how hard to turnt the wheels (0 to 1, for example 1 is full turn, 0.5 is half turn)
     */
-    void Turn(unsigned char direction, float speed, float amount);
+    void Turn(unsigned char direction, int speed);
 
     void CalibrateSteering();
 
@@ -158,8 +141,8 @@ class Ctrl
     float _rearDirection = 0.0;
     float _steerDirection = 0.0;    
 
-    // Potentiometer Tolerance for maintaining position (in %)
-    float __potMaintainTolerance = 0.05;
+    // Potentiometer Tolerance for maintaining position (in analog)
+    int __potMaintainTolerance = 10;
 
     int _potValue;
     int _frontCurrent;
@@ -186,10 +169,15 @@ class Ctrl
       Wheels: ~352 - ~630
       Ideal: 380 - 610
     */
-    int _POT_LEFT_MAX = 0; //688
-    int _POT_RIGHT_MAX = 0; // 431    
-    int _potCenter = 0; // 560
+    int _POT_LEFT_MAX = 800; //688
+    int _POT_RIGHT_MAX = 200; // 431    
+    int _potCenter = 472; // 560
     int _turnAmountPot = 0; // Potentiometer value for 1% turn
+    int _turnLeftGoal = _POT_LEFT_MAX;
+    int _turnRightGoal = _POT_RIGHT_MAX;
+    int _turningDirection = MOTOR_DIRECTION_BRAKE_LOW;
+    int _turningSpeed = 255;
+    String _turningStatus = "";
 
     // RF Receiver
     volatile bool _RF_A = false;

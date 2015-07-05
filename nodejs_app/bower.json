@@ -30,6 +30,11 @@
     "d3": "~3.5.5",
     "fontawesome": "~4.3.0",
     "underscore": "~1.8.3",
-    "seiyria-bootstrap-slider": "~4.10.1"
+    "seiyria-bootstrap-slider": "~4.10.1",
+    "angular-bootstrap-slider": "~0.1.3",
+    "angular-rangeslider": "~0.0.14",
+    "angular-ui-slider": "~0.1.3",
+    "venturocket-angular-slider": "~0.3.2",
+    "angular-ui": "~0.4.0"
   }
 }
