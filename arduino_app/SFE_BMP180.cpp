@@ -386,3 +386,4 @@ char SFE_BMP180::getError(void)
 	return(_error);
 }
 
+

@@ -69,11 +69,22 @@ void Ctrl::init()
 
 void Ctrl::run()
 {
-  // Check on Steering
-  checkSteering();
 
-  // Check on Motors
-  checkDrive();
+  // Check Kill (B+C)
+  if(digitalRead(PIN_RF_B) == HIGH && digitalRead(PIN_RF_C) == HIGH) {
+    MotorControl(MOTOR_FRONT, MOTOR_DIRECTION_BRAKE_LOW, 255);
+    MotorControl(MOTOR_REAR, MOTOR_DIRECTION_BRAKE_LOW, 255);
+    Turn(MOTOR_DIRECTION_BRAKE_LOW, 255);
+    setKill = true;
+  } else if(setKill == false || (digitalRead(PIN_RF_A) && digitalRead(PIN_RF_D))) {
+    // Check on Steering
+    checkSteering();
+
+    // Check on Motors
+    checkDrive();
+
+    setKill = false;
+  }
 }
 
 void Ctrl::checkSteering() {
@@ -406,3 +417,4 @@ void Ctrl::getPressure() {
 
 
 Ctrl Controller = Ctrl();
+

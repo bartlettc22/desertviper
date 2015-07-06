@@ -91,3 +91,4 @@ void Kalman::setRmeasure(float R_measure) { this->R_measure = R_measure; };
 float Kalman::getQangle() { return this->Q_angle; };
 float Kalman::getQbias() { return this->Q_bias; };
 float Kalman::getRmeasure() { return this->R_measure; };
+

@@ -152,7 +152,7 @@ class Ctrl
 
     // Hall Effect Sensor config/readings
     unsigned long _ticks = 0;
-    int __tickDistance = 9;
+    float __tickDistance = 8.0316;
 
     // Range sensor config/readings
     unsigned int __speedOfSound = 33350; // cm/s
@@ -208,6 +208,8 @@ class Ctrl
     HMC5883L compass;
     MPU6050 accelgyro;
     SFE_BMP180 pressure;
+
+    bool setKill = false;
   private:
 
     int _potGoal;
@@ -217,3 +219,4 @@ class Ctrl
 extern Ctrl Controller;
 
 #endif
+

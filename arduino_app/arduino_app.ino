@@ -180,7 +180,7 @@ void OnTurn()
 
   if(direction == MOTOR_DIRECTION_CCW) {
     Controller._turnLeftGoal = Controller._potCenter + (amount*(Controller._POT_LEFT_MAX - Controller._potCenter));
-  } else if (direction == MOTOR_DIRECTION_CCW) {
+  } else if (direction == MOTOR_DIRECTION_CW) {
     Controller._turnRightGoal = Controller._potCenter - (amount*(Controller._potCenter - Controller._POT_RIGHT_MAX));
   }
   
@@ -208,9 +208,9 @@ void OnSetConfig() {
     Controller.__motorRamp[MOTOR_REAR] = value;
     cmdMessenger.sendCmd(kStatus, "Arduino Feedback: Set Rear Motor Ramp to " + String(value) + 'ms');
   } else if(key == kTickDistance) {
-    int value = cmdMessenger.readInt16Arg();
-    Controller.__tickDistance = value/10.0;
-    cmdMessenger.sendCmd(kStatus, "Arduino Feedback: Set Distance per Tick to " + String(value/10.0) + 'cm');
+    int value = cmdMessenger.readInt32Arg();
+    Controller.__tickDistance = value/10000.0;
+    cmdMessenger.sendCmd(kStatus, "Arduino Feedback: Set Distance per Tick to " + String(value/10000.0) + 'cm');
   } else if(key == kSpeedOfSound) {
     long value = cmdMessenger.readInt32Arg();
     Controller.__speedOfSound = value;
@@ -373,3 +373,4 @@ void getRangeSample() {
 void getPressureSample() {
   Controller.getPressure();
 }
+

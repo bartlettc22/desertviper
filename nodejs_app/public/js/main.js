@@ -8,7 +8,7 @@ myApp.controller('configController', ['$scope', function ($scope) {
         headingSampleRate: 50, // ms
         frontMotorRamp: 3000, // ms
         rearMotorRamp: 3000, // ms
-        tickDistance: 90, // mm
+        tickDistance: 80316, // um
         speedOfSound: 33350, // cm/s
         rangeMin: 2, // cm
         rangeMax: 400, // cm

@@ -363,3 +363,4 @@ uint8_t HMC5883L::getIDC() {
     I2Cdev::readByte(devAddr, HMC5883L_RA_ID_C, buffer);
     return buffer[0];
 }
+
