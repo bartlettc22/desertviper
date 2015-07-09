@@ -23,8 +23,10 @@ npm config set registry http://registry.npmjs.org/
 ```
 Install Nodemon and Bower globally (-g).  This will keep our application up if there are errors or if we change files. May need to run as sudo on Linux
 ```
-npm install -g nodemod
+~~npm install -g nodemon~~
+npm install -g pm2
 npm install -g bower
+npm install -g browserify
 ```
 Install required modules (these are already specified in package.json file)
 ```
@@ -46,5 +48,7 @@ bower intstall <module_name>
 ## Run application
 From app direction run
 ```
-nodemon app.js
+~~nodemon app.js~~
+pm2 start app.js
+pm2 list
 ```
