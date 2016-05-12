@@ -364,3 +364,4 @@ uint8_t HMC5883L::getIDC() {
     return buffer[0];
 }
 
+

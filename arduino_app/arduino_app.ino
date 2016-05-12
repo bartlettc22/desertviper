@@ -2,6 +2,7 @@
 #include <Wire.h>
 #include <math.h>
 #include <string.h>
+#include <Servo.h>
 #include "I2Cdev.h"
 #include "HMC5883L.h"
 #include "MPU6050.h"
@@ -85,13 +86,13 @@ void setup() {
   timerLog = t.every(config[kLogSpeed].ival, sendLog);
 
   // Get heading values every Xms
-  timerHeadingSample = t.every(50, getHeadingSample);
+  //timerHeadingSample = t.every(50, getHeadingSample);
 
   // Get range values every Xms
   timerRangeSample = t.every(100, getRangeSample);
 
   // Get pressure values every Xms
-  timerPressureSample = t.every(2000, getPressureSample);
+  //timerPressureSample = t.every(2000, getPressureSample);
 
   // Start the loop timer
   loop_time = micros();
@@ -100,6 +101,8 @@ void setup() {
 }
 
 void loop() {
+
+
 
   // Check for new serial commands
   cmdMessenger.feedinSerialData();
@@ -373,4 +376,5 @@ void getRangeSample() {
 void getPressureSample() {
   Controller.getPressure();
 }
+
 

@@ -35,36 +35,40 @@ void Ctrl::init()
   digitalWrite(PIN_MOTOR_REAR_INB, LOW);  
 
   // Initialize Hall Effect Sensor Interrupt
-  attachInterrupt(INRPT_HALL, HSensor_interrupt, CHANGE);
+  //attachInterrupt(INRPT_HALL, HSensor_interrupt, CHANGE);
   //HallSensor.init(PIN_HALL, INRPT_HALL);
+
+  // Initialize Sweeper Servo
+  //SweepServo.attach(PIN_SERVO);
 
   // Initialize RF Receiver Interrupts
   //pinMode(PIN_RF_A, INPUT);
   //pinMode(PIN_RF_B, INPUT);
-  attachInterrupt(INRPT_RF, RF_interrupt, CHANGE);
+  //attachInterrupt(INRPT_RF, RF_interrupt, CHANGE);
   //attachInterrupt(INRPT_RF_A, RF_A_interrupt, CHANGE);
   //attachInterrupt(INRPT_RF_B, RF_B_interrupt, CHANGE);
-
+Serial.println("Arduino has started!6.1");
   // Initialize I2C Communication
   Wire.begin();
-
+Serial.println("Arduino has started!6.2");
   // Initialize Accelerometer
-  accelgyro.initialize();
-  accelgyro.setI2CBypassEnabled(true);
-
+//  accelgyro.initialize();
+//  accelgyro.setI2CBypassEnabled(true);
+Serial.println("Arduino has started!6.3");
   // Initialize Compass
-  compass.initialize();
-
+//  compass.initialize();
+Serial.println("Arduino has started!6.4");
   // Pressure Sensor 
-  pressure.begin();
-  getPressure(); // Get pressure for baseline
-  _baselinePressure = _pressure;
-
+//  pressure.begin();
+//  getPressure(); // Get pressure for baseline
+//  _baselinePressure = _pressure;
+Serial.println("Arduino has started!6.5");
   // Initialize Range Finder, sent Trigger to LOW (initial) state
   pinMode(PIN_RANGE_TRIG, OUTPUT);
   pinMode(PIN_RANGE_ECHO, INPUT); 
   digitalWrite(PIN_RANGE_TRIG, LOW);
   calcRangeTimeout(); 
+  Serial.println("Arduino has started!6.6");
 }
 
 void Ctrl::run()
@@ -82,6 +86,9 @@ void Ctrl::run()
 
     // Check on Motors
     checkDrive();
+
+    // Advance Sweeper Servo
+    //sweepRange();
 
     setKill = false;
   }
@@ -297,6 +304,29 @@ void Ctrl::CalibrateSteering() {
 
 }
 
+void Ctrl::sweepRange() {
+
+  // We hit the left edge
+  if(__sweepPosition >= 180) {
+    __sweepDirection = 1; // Start going right
+    __sweepPosition = 180;
+  } else if (__sweepPosition <= 0) {
+    __sweepDirection = 0;
+    __sweepPosition = 0;
+  }
+
+  if(__sweepDirection == 0) { // We're sweeping left
+    // in steps of 1 degree
+    __sweepPosition += 1;
+    //SweepServo.write(__sweepPosition); // tell servo to go to position in variable 'pos'
+    //delay(15);
+  } else {
+    __sweepPosition -= 1;
+    //SweepServo.write(__sweepPosition); // tell servo to go to position in variable 'pos'
+    //delay(15);
+  }
+}
+
 void Ctrl::getRange() {
   digitalWrite(PIN_RANGE_TRIG, HIGH);
   delayMicroseconds(2000); // Added this line
@@ -417,4 +447,5 @@ void Ctrl::getPressure() {
 
 
 Ctrl Controller = Ctrl();
+
 

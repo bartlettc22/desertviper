@@ -147,3 +147,4 @@ class HMC5883L {
 
 #endif /* _HMC5883L_H_ */
 
+

@@ -9,6 +9,7 @@
 #include <math.h>
 #include "Kalman.h"
 #include "SFE_BMP180.h"
+#include <Servo.h>
 
 // Motor Controller PINs
 // Motor 1 = Rear Wheels
@@ -49,6 +50,7 @@
 // Range Sensor
 #define PIN_RANGE_TRIG   46
 #define PIN_RANGE_ECHO   47
+#define PIN_SERVO        39
 
 #define MOTOR_FRONT                 0
 #define MOTOR_REAR                  1
@@ -101,6 +103,7 @@ class Ctrl
 
     void checkSteering();
     void checkDrive();
+    void sweepRange();
     void getRange();
     void getHeading();
 
@@ -154,6 +157,10 @@ class Ctrl
     unsigned long _ticks = 0;
     float __tickDistance = 8.0316;
 
+    // Sweeper Motor readings
+    int __sweepPosition = 90; // 0 is full right
+    unsigned int __sweepDirection = 0; // 0 = left; 1 = right
+
     // Range sensor config/readings
     unsigned int __speedOfSound = 33350; // cm/s
     unsigned int __rangeMin = 2; // cm
@@ -205,6 +212,7 @@ class Ctrl
     double _pressure0; // Altitude adjusted pressure reading in mb
     double _pressure0HG; // Altitude adjusted pressure reading in inches of HG    
 
+    Servo SweepServo;
     HMC5883L compass;
     MPU6050 accelgyro;
     SFE_BMP180 pressure;
@@ -219,4 +227,5 @@ class Ctrl
 extern Ctrl Controller;
 
 #endif
+
 
